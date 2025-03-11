@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QuizApp.Models
-{
+namespace Models.Models
+{ 
     public class UserAnswer
     {
         [Key]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QuizApp.Models;
+using Models.Models;
+
 namespace DataAccess
 {
     public class AppDbContext : DbContext
@@ -10,7 +11,7 @@ namespace DataAccess
         public DbSet<User>Users { get; set; }
         public DbSet<UserAnswer>UserAnswers{ get; set; }
         public DbSet<UserQuiz>UserQuizzes{ get; set; }
-        public AppDbContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

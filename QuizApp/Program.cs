@@ -3,7 +3,7 @@ using DataAccess.IRepo;
 using DataAccess.Repo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using QuizApp.Models;
+using Models.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(opts =>
-{
-    opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+    opts.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+));
+
+
+
+
 builder.Services.AddScoped<IBaseRepository<Answer>, BaseRepository<Answer>>();
 builder.Services.AddScoped<IBaseRepository<Quiz>, BaseRepository<Quiz>>();
 builder.Services.AddScoped<IBaseRepository<Question>, BaseRepository<Question>>();
@@ -22,6 +26,7 @@ builder.Services.AddScoped<IBaseRepository<UserAnswer>, BaseRepository<UserAnswe
 builder.Services.AddScoped<IBaseRepository<UserQuiz>, BaseRepository<UserQuiz>>();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -43,3 +48,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
