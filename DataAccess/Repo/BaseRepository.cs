@@ -14,10 +14,10 @@ namespace DataAccess.Repo
         private readonly DbSet<T> _set;
         private readonly AppDbContext _context;
 
-        public BaseRepository(DbSet<T> set, AppDbContext context)
+        public BaseRepository(AppDbContext context)
         {
-            _set = set;
             _context = context;
+            _set = context.Set<T>();
         }
 
         public async Task AddAsync(T entity)

@@ -18,12 +18,13 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 
 
 
-builder.Services.AddScoped<IBaseRepository<Answer>, BaseRepository<Answer>>();
-builder.Services.AddScoped<IBaseRepository<Quiz>, BaseRepository<Quiz>>();
-builder.Services.AddScoped<IBaseRepository<Question>, BaseRepository<Question>>();
-builder.Services.AddScoped<IBaseRepository<User>, BaseRepository<User>>();
-builder.Services.AddScoped<IBaseRepository<UserAnswer>, BaseRepository<UserAnswer>>();
-builder.Services.AddScoped<IBaseRepository<UserQuiz>, BaseRepository<UserQuiz>>();
+builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+//builder.Services.AddScoped<IBaseRepository<Answer>, BaseRepository<Answer>>();
+//builder.Services.AddScoped<IBaseRepository<Quiz>, BaseRepository<Quiz>>();
+//builder.Services.AddScoped<IBaseRepository<Question>, BaseRepository<Question>>();
+//builder.Services.AddScoped<IBaseRepository<User>, BaseRepository<User>>();
+//builder.Services.AddScoped<IBaseRepository<UserAnswer>, BaseRepository<UserAnswer>>();
+//builder.Services.AddScoped<IBaseRepository<UserQuiz>, BaseRepository<UserQuiz>>();
 
 var app = builder.Build();
 
