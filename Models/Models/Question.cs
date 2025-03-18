@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models.Models
@@ -13,8 +14,9 @@ namespace Models.Models
         public string? PathToFile{ get; set; }
         public int QuizId { get; set; }
         [ForeignKey("QuizId")]
+        [ValidateNever]
         public Quiz Quiz { get; set; }
-        //public ICollection<Answer> Answers { get; set; }
+        public List<Answer> Answers { get; set; } = new List<Answer>();
     }
     public enum QuestionType
     {

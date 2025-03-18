@@ -1,5 +1,6 @@
 ﻿using DataAccess.IRepo;
 using Microsoft.EntityFrameworkCore;
+using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace DataAccess.Repo
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        private readonly DbSet<T> _set;
-        private readonly AppDbContext _context;
+        protected readonly DbSet<T> _set;
+        protected readonly AppDbContext _context;
 
         public BaseRepository(AppDbContext context)
         {
@@ -44,7 +45,7 @@ namespace DataAccess.Repo
 
         public async Task<T> GetByIdAsync(int id)
         {
-            return await _set.FindAsync(id);
+            return await _set.FindAsync(id); ;
 
         }
 

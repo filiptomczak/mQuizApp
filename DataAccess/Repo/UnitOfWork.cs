@@ -14,7 +14,7 @@ namespace DataAccess.Repo
 
         public UnitOfWork(
             AppDbContext context,
-            IBaseRepository<Question> questions,
+            IQuestionRepository questions,
             IBaseRepository<Quiz> quizzes
             //IBaseRepository<Answer> answers, 
             //IBaseRepository<User> users, 
@@ -35,7 +35,7 @@ namespace DataAccess.Repo
         //public IBaseRepository<UserAnswer> UserAnswers { get; }
         //public IBaseRepository<UserQuiz> UserQuizzes { get; }
         //public IBaseRepository<Answer> Answers { get; }
-        public IBaseRepository<Question> Questions { get; }
+        public IQuestionRepository Questions { get; }
         public IBaseRepository<Quiz> Quizzes { get; }
         public async Task CommitAsync()
         {

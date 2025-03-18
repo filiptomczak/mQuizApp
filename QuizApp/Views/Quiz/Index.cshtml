@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Quiz>
+
+<div>
+    <a asp-action="Update" class="btn btn-primary">Create new quiz</a>
+</div>
+<div>
+    @foreach(var quiz in Model)
+    {
+        <div id="quiz-@quiz.Id">
+        <a asp-action="Update" asp-route-id="@quiz.Id" class="btn btn-warning">Edit</a>
+        <a asp-action="Delete" asp-route-id="@quiz.Id" class="btn btn-danger" onclick="Delete(@quiz.Id,event)">Delete</a>
+        <h1>@quiz.Title</h1>
+        <h2>@quiz.Description</h2>
+        @* <ul>
+            @foreach(var question in quiz.Questions)
+            {
+                <li>
+                    <h3>Pytanie: </h3>
+                    <h4>@question.Text</h4>
+                </li>
+            }
+        </ul> *@
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script>
+        function Delete(id,event) {
+            event.preventDefault();
+            console.log("delete [id]:" + id);
+            $.ajax({
+                url: `/quiz/deleteQuestion?id=${id}`,
+                type: 'DELETE',
+                success:function(data){
+                    console.log(data.message);
+                    $("#quiz-" + id).remove();
+                }
+            })
+        }
+    </script>
+}

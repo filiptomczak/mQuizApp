@@ -13,7 +13,7 @@ namespace DataAccess.IRepo
         //public IBaseRepository<UserAnswer> UserAnswers { get; }
         //public IBaseRepository<UserQuiz> UserQuizzes { get; }
         //public IBaseRepository<Answer> Answers { get; }
-        public IBaseRepository<Question> Questions { get; }
+        public IQuestionRepository Questions { get; }
         public IBaseRepository<Quiz> Quizzes { get; }
         public Task CommitAsync();
     }
