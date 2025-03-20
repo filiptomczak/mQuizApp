@@ -21,42 +21,61 @@
 
     <div>
         <label>Questions</label>
-        
-            @if (Model.Questions.Count != 0){
-                foreach (var question in Model.Questions){
-                    <div class="question border p-3 mt-3" id="question-@question.Id">
-                    <input type="hidden" name="@question.QuizId" value="@Model.Quiz.Id" />
 
-                            <label>Pytanie:</label>
-                            <input type="text" asp-for="@question.Text" name="@question.Text" class="form-control" required />
+        <!-- Pytania będą dodawane tutaj -->
+        @if (Model.Questions.Count != 0){
+            for (int i=0; i<Model.Questions.Count;i++){
+                <div class="question border p-3 mt-3" id="question-@Model.Questions[i].Id">
+                    <input type="hidden" asp-for="Questions[i].QuizId"/>
+                    <input type="hidden" asp-for="Questions[i].Id"/>
 
-                            <label>Typ pytania:</label>
-                            <select name="@question.TypeOfQuestion" class="form-control">
-                                <option value="Text">Tekstowe</option>
-                                <option value="Image">Obraz</option>
-                                <option value="Sound">Dźwięk</option>
-                            </select>
+                    <label>Pytanie:</label>
+                    <input type="text" asp-for="Questions[i].Text" class="form-control" required />
 
-                            <h4>Odpowiedzi</h4>
-                            <div id="answers-container-${questionIndex}">
-                                <!-- Odpowiedzi będą dodawane tutaj -->
-                            </div>
+                    <label>Typ pytania:</label>
+                    <select asp-for="Questions[i].TypeOfQuestion" class="form-control">
+                        <option value="Text">Tekstowe</option>
+                        <option value="Image">Obraz</option>
+                        <option value="Sound">Dźwięk</option>
+                    </select>
 
-                            <button type="button" class="btn btn-secondary mt-2" onclick="addAnswer(@question.Id)">Dodaj odpowiedź</button>
-                            <button type="button" class="btn btn-danger mt-2" onclick="deleteQuestion('@question.Id',event)">Usuń pytanie</button>
+                    <h4>Odpowiedzi</h4>
+                    <div id="answers-container-@Model.Questions[i].Id">
+                        <!-- Odpowiedzi będą dodawane tutaj -->
+                            @if (Model.Questions[i].Answers.Count != 0){
+                            for (int j = 0; j < Model.Questions[i].Answers.Count ;j++){
+
+                                <h1>answer-@Model.Questions[i].Answers[j].Id</h1>
+                                <div class="answer mt-2" id="answer-@Model.Questions[i].Answers[j].Id">
+                                    @* <input type="hidden" asp-for="@Model.Questions[i].Answers[j].Id"/> *@
+                                    <input type="hidden" asp-for="Questions[i].Answers[j].Id" />
+                                    <input type="hidden" asp-for="Questions[i].Answers[j].QuestionId" />
+                                
+                                    <input type="text" asp-for="Questions[i].Answers[j].Text" class="form-control" required />
+                                    <label>Poprawna odpowiedź?</label>
+                                    <input type="checkbox" asp-for="Questions[i].Answers[j].IsCorrect" />
+                                    <button type="button" class="btn btn-danger" onclick="deleteAnswer('@Model.Questions[i].Answers[j].Id',event)">Usuń</button>
+                                </div>
+                            }
+                        }
+                </div>
+
+                <button type="button" class="btn btn-secondary mt-2" onclick="addAnswer(@Model.Questions[i].Id)">Dodaj odpowiedź</button>
+                <button type="button" class="btn btn-danger mt-2" onclick="deleteQuestion('@Model.Questions[i].Id',event)">Usuń pytanie</button>
                     
-                    </div>
-                }
+            </div>
             }
-            <div id="question-container">
+        }
+        <div id="question-container">
         </div>
     </div>
     <button onClick ="addQuestion(@Model.Quiz.Id,event)" id="add-question" type="button" class="btn btn-primary">Add Question</button>
-    <button onclick="saveQuestions" type="submit" class="btn btn-success">@(Model.Quiz.Id == 0 ? "Save" : "Update")</button>
+    <button @* onClick="saveQuestions" *@ type="submit" class="btn btn-success">@(Model.Quiz.Id == 0 ? "Save" : "Update")</button>
 </form>
 
 @section Scripts{
 <script>
+
     function addQuestion(quizId, event) {
         event.preventDefault();
         let questionIndex = document.querySelectorAll(".question").length;
@@ -85,34 +104,9 @@
                 `;
         document.getElementById("question-container").insertAdjacentHTML('beforeend', questionHtml);
     }
-    @* // document.getElementById("add-question").addEventListener("click", function () {
-    //     let questionIndex = document.querySelectorAll(".question").length;
-    //     let questionHtml = `
-    //                  <div class="question border p-3 mt-3" id="question-${questionIndex}">
-    //                     <input type="hidden" name="Questions[${questionIndex}].QuizId" value="${quizId}" />
 
-    //                     <label>Pytanie:</label>
-    //                     <input type="text" asp-for="Questions[0].Text" name="Questions[${questionIndex}].Text" class="form-control" required />
-
-    //                     <label>Typ pytania:</label>
-    //                     <select name="Questions[${questionIndex}].TypeOfQuestion" class="form-control">
-    //                         <option value="Text">Tekstowe</option>
-    //                         <option value="Image">Obraz</option>
-    //                         <option value="Sound">Dźwięk</option>
-    //                     </select>
-
-    //                     <h4>Odpowiedzi</h4>
-    //                     <div id="answers-container-${questionIndex}">
-    //                         <!-- Odpowiedzi będą dodawane tutaj -->
-    //                     </div>
-
-    //                     <button type="button" class="btn btn-secondary mt-2" onclick="addAnswer(${questionIndex})">Dodaj odpowiedź</button>
-    //                     <button type="button" class="btn btn-danger mt-2" onclick="removeElement('question-${questionIndex}')">Usuń pytanie</button>
-    //                 </div>
-    //         `;
-    //     document.getElementById("question-container").insertAdjacentHTML('beforeend', questionHtml);
-    // }); *@
     function addAnswer(questionIndex){
+        console.log(`answers-container-${questionIndex}`)
         let answersContainer = document.getElementById(`answers-container-${questionIndex}`);
         let answerIndex = answersContainer.querySelectorAll(".answer").length;
         let answerHtml = `
@@ -131,6 +125,7 @@
     }
 
     function removeElement(id){
+        console.log(`element id to delete: ${id}`)
         document.getElementById(id).remove();
     }
 
@@ -147,8 +142,17 @@
         });
     }
 
-    function saveQuestions() {
-
+    function deleteAnswer(id, event) {
+        event.preventDefault();
+        console.log("delete [id]:" + id);
+        $.ajax({
+            url: `/quiz/deleteAnswer?id=${id}`,
+            type: 'DELETE',
+            success: function (data) {
+                console.log(data.message);
+                removeElement("answer-" + id);//answer-id - to id diva zawierajacego element answer
+            }
+        });
     }
 </script>
 }

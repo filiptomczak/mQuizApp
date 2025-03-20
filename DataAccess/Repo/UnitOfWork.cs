@@ -15,15 +15,15 @@ namespace DataAccess.Repo
         public UnitOfWork(
             AppDbContext context,
             IQuestionRepository questions,
-            IBaseRepository<Quiz> quizzes
-            //IBaseRepository<Answer> answers, 
+            IBaseRepository<Quiz> quizzes,
+            IBaseRepository<Answer> answers
             //IBaseRepository<User> users, 
             //IBaseRepository<UserAnswer> userAnswers, 
             //IBaseRepository<UserQuiz> userQuizzes
             )
         {
             _context = context;
-            //Answers = answers;
+            Answers = answers;
             Questions = questions;
             Quizzes = quizzes;
             //Users = users;
@@ -34,7 +34,7 @@ namespace DataAccess.Repo
         //public IBaseRepository<User> Users { get; }
         //public IBaseRepository<UserAnswer> UserAnswers { get; }
         //public IBaseRepository<UserQuiz> UserQuizzes { get; }
-        //public IBaseRepository<Answer> Answers { get; }
+        public IBaseRepository<Answer> Answers { get; }
         public IQuestionRepository Questions { get; }
         public IBaseRepository<Quiz> Quizzes { get; }
         public async Task CommitAsync()

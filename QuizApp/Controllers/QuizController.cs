@@ -32,6 +32,12 @@ namespace QuizApp.Controllers
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
             var questionsAll = await _unitOfWork.Questions.GetAllAsync();
             var questionsToQuiz = questionsAll.Where(x=>x.QuizId==quiz.Id).ToList();
+            var answersAll = await _unitOfWork.Answers.GetAllAsync();
+
+            foreach (var question in questionsToQuiz) {
+                question.Answers = answersAll.Where(x=>x.QuestionId==question.Id).ToList();
+            }
+            
             var quizVM = new QuizVM()
             {
                 Quiz = quiz,
@@ -44,28 +50,66 @@ namespace QuizApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var quiz = new Quiz()
+                var quizFromDb = _unitOfWork.Quizzes.Get(x=>x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
+                if (quizFromDb == null)
                 {
-                    Id = quizVM.Quiz.Id,
-                    Title = quizVM.Quiz.Title,
-                    Description = quizVM.Quiz.Description,
-                    Questions = quizVM.Questions.Select(q => new Question
+                    return NotFound();
+                }
+
+                quizFromDb.Title = quizVM.Quiz.Title;
+                quizFromDb.Description = quizVM.Quiz.Description;
+
+                foreach (var questionVM in quizVM.Questions)
+                {
+                    var questionFromDb = quizFromDb.Questions.FirstOrDefault(x => x.Id == questionVM.Id);
+                    if (questionFromDb != null)
                     {
-                        Text = q.Text,
-                        TypeOfQuestion = q.TypeOfQuestion,
-                        QuizId = quizVM.Quiz.Id, 
-                        Answers = q.Answers.Select(a => new Answer
+
+                        questionFromDb.Text = questionVM.Text;
+                        questionFromDb.TypeOfQuestion = questionVM.TypeOfQuestion;
+                        questionFromDb.PathToFile = questionVM.PathToFile;
+
+
+                        foreach (var answerVM in questionVM.Answers)
                         {
-                            Text = a.Text,
-                            IsCorrect = a.IsCorrect
-                        }).ToList()
-                    }).ToList()
-                };
-                _unitOfWork.Quizzes.Update(quiz);
-                //_unitOfWork.Questions.UpdateRange(quizVM.Questions);
+                            var answerFromDb = questionFromDb.Answers.FirstOrDefault(a => a.Id == answerVM.Id);
+                            if (answerFromDb != null)
+                            {
+                                // Jeśli odpowiedź istnieje -> aktualizuj
+                                answerFromDb.Text = answerVM.Text;
+                                answerFromDb.IsCorrect = answerVM.IsCorrect;
+                            }
+                            else
+                            {
+                                // Jeśli odpowiedzi NIE ma -> dodaj nową
+                                questionVM.Answers.Add(new Answer
+                                {
+                                    Text = answerVM.Text,
+                                    IsCorrect = answerVM.IsCorrect
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        quizFromDb.Questions.Add(new Question
+                        {
+                            Text = questionVM.Text,
+                            TypeOfQuestion = questionVM.TypeOfQuestion,
+                            PathToFile = questionVM.PathToFile,
+                            QuizId = quizVM.Quiz.Id,
+                            Answers = questionVM.Answers.Select(a => new Answer
+                            {
+                                Text = a.Text,
+                                IsCorrect = a.IsCorrect
+                            }).ToList()
+                        });
+                    }
+                }
+                _unitOfWork.Quizzes.Update(quizFromDb);
                 return RedirectToAction(nameof(Index));
             }
-            return View("Update",quizVM.Quiz.Id);
+            return RedirectToAction("Update",quizVM.Quiz.Id);
         }
 
 
@@ -90,6 +134,18 @@ namespace QuizApp.Controllers
             {
                 success = true,
                 message = "Question Succesfully Deleted",
+            });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAnswer(int id)
+        {
+            var entity = await _unitOfWork.Answers.GetByIdAsync(id);
+            _unitOfWork.Answers.Delete(entity);
+            return Json(new
+            {
+                success = true,
+                message = "Answer Succesfully Deleted",
             });
         }
         #endregion
