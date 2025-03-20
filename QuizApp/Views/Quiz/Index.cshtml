@@ -1,27 +1,34 @@
 ﻿@model IEnumerable<Quiz>
 
-<div>
-    <a asp-action="Update" class="btn btn-primary">Create new quiz</a>
-</div>
-<div>
-    @foreach(var quiz in Model)
-    {
-        <div id="quiz-@quiz.Id">
-        <a asp-action="Update" asp-route-id="@quiz.Id" class="btn btn-warning">Edit</a>
-        <a asp-action="Delete" asp-route-id="@quiz.Id" class="btn btn-danger" onclick="Delete(@quiz.Id,event)">Delete</a>
-        <h1>@quiz.Title</h1>
-        <h2>@quiz.Description</h2>
-        @* <ul>
-            @foreach(var question in quiz.Questions)
-            {
-                <li>
-                    <h3>Pytanie: </h3>
-                    <h4>@question.Text</h4>
-                </li>
-            }
-        </ul> *@
-        </div>
-    }
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Quiz List</h2>
+        <a asp-action="Update" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New Quiz
+        </a>
+    </div>
+
+    <div class="row">
+        @foreach (var quiz in Model)
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow-lg border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-dark">@quiz.Title</h5>
+                        <p class="card-text text-muted">@quiz.Description</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between">
+                        <a asp-action="Update" asp-route-id="@quiz.Id" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <button class="btn btn-danger btn-sm" onclick="Delete(@quiz.Id, event)">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
 
 @section Scripts{

@@ -1,77 +1,106 @@
 ﻿@model QuizVM
 
-<div>
-    <h2>
-        @(Model.Quiz.Id == 0 ? "Create" : "Edit")
-    </h2>
-</div>
-<form method="post">
-    <div>
-        <h1>@Model.Quiz.Id</h1>
-        <input asp-for="Quiz.Id" type="hidden"/>
-        <label asp-for="Quiz.Title"></label>
-        <input asp-for="Quiz.Title" type="text" class="form-control" />
-        <span asp-validation-for="Quiz.Title" class="text-danger"></span>
-    </div> 
-    <div>
-        <label asp-for="Quiz.Description"></label>
-        <input asp-for="Quiz.Description" type="text" class="form-control" />
-        <span asp-validation-for="Quiz.Description" class="text-danger"></span>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            @(Model.Quiz.Id == 0 ? "Create a New Quiz" : "Edit Quiz")
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-primary ms-2">
+            <i class="fas fa-home"></i> Home
+        </a>
     </div>
+    
 
-    <div>
-        <label>Questions</label>
+        
+        
+    <form method="post">
+        <input asp-for="Quiz.Id" type="hidden" />
 
-        <!-- Pytania będą dodawane tutaj -->
-        @if (Model.Questions.Count != 0){
-            for (int i=0; i<Model.Questions.Count;i++){
-                <div class="question border p-3 mt-3" id="question-@Model.Questions[i].Id">
-                    <input type="hidden" asp-for="Questions[i].QuizId"/>
-                    <input type="hidden" asp-for="Questions[i].Id"/>
-
-                    <label>Pytanie:</label>
-                    <input type="text" asp-for="Questions[i].Text" class="form-control" required />
-
-                    <label>Typ pytania:</label>
-                    <select asp-for="Questions[i].TypeOfQuestion" class="form-control">
-                        <option value="Text">Tekstowe</option>
-                        <option value="Image">Obraz</option>
-                        <option value="Sound">Dźwięk</option>
-                    </select>
-
-                    <h4>Odpowiedzi</h4>
-                    <div id="answers-container-@Model.Questions[i].Id">
-                        <!-- Odpowiedzi będą dodawane tutaj -->
-                            @if (Model.Questions[i].Answers.Count != 0){
-                            for (int j = 0; j < Model.Questions[i].Answers.Count ;j++){
-
-                                <h1>answer-@Model.Questions[i].Answers[j].Id</h1>
-                                <div class="answer mt-2" id="answer-@Model.Questions[i].Answers[j].Id">
-                                    @* <input type="hidden" asp-for="@Model.Questions[i].Answers[j].Id"/> *@
-                                    <input type="hidden" asp-for="Questions[i].Answers[j].Id" />
-                                    <input type="hidden" asp-for="Questions[i].Answers[j].QuestionId" />
-                                
-                                    <input type="text" asp-for="Questions[i].Answers[j].Text" class="form-control" required />
-                                    <label>Poprawna odpowiedź?</label>
-                                    <input type="checkbox" asp-for="Questions[i].Answers[j].IsCorrect" />
-                                    <button type="button" class="btn btn-danger" onclick="deleteAnswer('@Model.Questions[i].Answers[j].Id',event)">Usuń</button>
-                                </div>
-                            }
-                        }
-                </div>
-
-                <button type="button" class="btn btn-secondary mt-2" onclick="addAnswer(@Model.Questions[i].Id)">Dodaj odpowiedź</button>
-                <button type="button" class="btn btn-danger mt-2" onclick="deleteQuestion('@Model.Questions[i].Id',event)">Usuń pytanie</button>
-                    
-            </div>
-            }
-        }
-        <div id="question-container">
+        <!-- Quiz Title -->
+        <div class="mb-3">
+            <label asp-for="Quiz.Title" class="form-label fw-bold">Quiz Title</label>
+            <input asp-for="Quiz.Title" type="text" class="form-control" placeholder="Enter quiz title" required />
+            <span asp-validation-for="Quiz.Title" class="text-danger"></span>
         </div>
-    </div>
-    <button onClick ="addQuestion(@Model.Quiz.Id,event)" id="add-question" type="button" class="btn btn-primary">Add Question</button>
-    <button @* onClick="saveQuestions" *@ type="submit" class="btn btn-success">@(Model.Quiz.Id == 0 ? "Save" : "Update")</button>
-</form>
+
+        <!-- Quiz Description -->
+        <div class="mb-3">
+            <label asp-for="Quiz.Description" class="form-label fw-bold">Description</label>
+            <input asp-for="Quiz.Description" type="text" class="form-control" placeholder="Enter quiz description" required />
+            <span asp-validation-for="Quiz.Description" class="text-danger"></span>
+        </div>
+
+        <!-- Questions -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">Questions</label>
+
+            @if (Model.Questions.Count > 0)
+            {
+                @for (int i = 0; i < Model.Questions.Count; i++)
+                {
+                    <div class="card shadow-sm border-0 mt-3" id="question-@Model.Questions[i].Id">
+                        <div class="card-body">
+                            <input type="hidden" asp-for="Questions[i].QuizId" />
+                            <input type="hidden" asp-for="Questions[i].Id" />
+
+                            <label class="form-label fw-bold">Question:</label>
+                            <input type="text" asp-for="Questions[i].Text" class="form-control mb-2" required placeholder="Enter question text" />
+
+                            <label class="form-label fw-bold">Question Type:</label>
+                            <select asp-for="Questions[i].TypeOfQuestion" class="form-select mb-2">
+                                <option value="Text">Text</option>
+                                <option value="Image">Image</option>
+                                <option value="Sound">Sound</option>
+                            </select>
+
+                            <h5 class="mt-3">Answers</h5>
+                            <div id="answers-container-@Model.Questions[i].Id">
+                                @if (Model.Questions[i].Answers.Count > 0)
+                                {
+                                    @for (int j = 0; j < Model.Questions[i].Answers.Count; j++)
+                                    {
+                                        <div class="input-group mt-2" id="answer-@Model.Questions[i].Answers[j].Id">
+                                            <input type="hidden" asp-for="Questions[i].Answers[j].Id" />
+                                            <input type="hidden" asp-for="Questions[i].Answers[j].QuestionId" />
+                                            
+                                            <input type="text" asp-for="Questions[i].Answers[j].Text" class="form-control" required placeholder="Enter answer text" />
+                                            
+                                            <span class="input-group-text">
+                                                <input type="checkbox" asp-for="Questions[i].Answers[j].IsCorrect" class="form-check-input" title="Correct answer" />
+                                            </span>
+
+                                            <button type="button" class="btn btn-danger" onclick="deleteAnswer('@Model.Questions[i].Answers[j].Id', event)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <button type="button" class="btn btn-secondary mt-3" onclick="addAnswer(@Model.Questions[i].Id)">
+                                <i class="fas fa-plus"></i> Add Answer
+                            </button>
+
+                            <button type="button" class="btn btn-danger mt-3 float-end" onclick="deleteQuestion('@Model.Questions[i].Id', event)">
+                                <i class="fas fa-trash"></i> Remove Question
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div id="question-container"></div>
+
+        <button type="button" class="btn btn-primary" onclick="addQuestion(@Model.Quiz.Id, event)">
+            <i class="fas fa-plus"></i> Add Question
+        </button>
+        <button type="submit" class="btn btn-success ms-2">
+            <i class="fas fa-save"></i> @(Model.Quiz.Id == 0 ? "Save" : "Update")
+        </button>
+
+    </form>
+</div>
 
 @section Scripts{
 <script>
