@@ -83,19 +83,6 @@ namespace QuizApp.Controllers
                         foreach (var questionVM in quizVM.Questions)
                         {
                             AddQuestionsToQuizFromQuizVM(quizVM, quiz);
-
-                            //    quiz.Questions.Add(new Question
-                            //    {
-                            //        Text = questionVM.Text,
-                            //        TypeOfQuestion = questionVM.TypeOfQuestion,
-                            //        PathToFile = questionVM.PathToFile,
-                            //        QuizId = quizVM.Quiz.Id,
-                            //        Answers = questionVM.Answers.Select(a => new Answer
-                            //        {
-                            //            Text = a.Text,
-                            //            IsCorrect = a.IsCorrect
-                            //        }).ToList()
-                            //    });
                         }
                     }
                         _unitOfWork.Quizzes.Update(quiz);
@@ -144,19 +131,6 @@ namespace QuizApp.Controllers
                     else
                     {
                         AddQuestionsToQuizFromQuizVM(quizVM, quizFromDb);
-
-                        //quizFromDb.Questions.Add(new Question
-                        //{
-                        //    Text = questionVM.Text,
-                        //    TypeOfQuestion = questionVM.TypeOfQuestion,
-                        //    PathToFile = questionVM.PathToFile,
-                        //    QuizId = quizVM.Quiz.Id,
-                        //    Answers = questionVM.Answers.Select(a => new Answer
-                        //    {
-                        //        Text = a.Text,
-                        //        IsCorrect = a.IsCorrect
-                        //    }).ToList()
-                        //});
                     }
                 }
                 _unitOfWork.Quizzes.Update(quizFromDb);

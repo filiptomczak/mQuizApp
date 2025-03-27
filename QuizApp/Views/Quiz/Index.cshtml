@@ -3,7 +3,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">Quiz List</h2>
-        <a asp-action="Update" class="btn btn-success">
+        <a asp-action="Update" class="btn btn-outline-success">
             <i class="fas fa-plus"></i> Create New Quiz
         </a>
     </div>
@@ -11,7 +11,7 @@
     <div class="row">
         @foreach (var quiz in Model)
         {
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4" id="quiz-@quiz.Id">
                 <div class="card shadow-lg border-0 h-100">
                     <div class="card-body">
                         <h5 class="card-title text-dark">@quiz.Title</h5>
@@ -37,7 +37,7 @@
             event.preventDefault();
             console.log("delete [id]:" + id);
             $.ajax({
-                url: `/quiz/deleteQuestion?id=${id}`,
+                url: `/quiz/delete?id=${id}`,
                 type: 'DELETE',
                 success:function(data){
                     console.log(data.message);
