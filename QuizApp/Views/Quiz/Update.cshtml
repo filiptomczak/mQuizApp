@@ -3,17 +3,14 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">
-            @(Model.Quiz.Id == 0 ? "Create a New Quiz" : "Edit Quiz")
+            @(Model.Quiz.Id == 0 ? "Stwórz nowy quiz" : "Edytuj quiz")
         </h2>
         <a asp-action="Index" class="btn btn-outline-primary ms-2">
-            <i class="fas fa-home"></i> Home
+            <i class="fas fa-home"></i> Powrót
         </a>
     </div>
-    
-
         
-        
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <input asp-for="Quiz.Id" type="hidden" />
 
         <!-- Quiz Title -->
@@ -29,75 +26,26 @@
             <input asp-for="Quiz.Description" type="text" class="form-control" placeholder="Enter quiz description" required />
             <span asp-validation-for="Quiz.Description" class="text-danger"></span>
         </div>
-
-        <!-- Questions -->
-        <div class="mb-4">
-            <label class="form-label fw-bold">Questions</label>
-
-            @if (Model.Questions.Count > 0)
+        <!-- Quiz Questions -->
+        <div id="question-container">
+            @for (int i = 0; i < Model.Questions.Count; i++)
             {
-                @for (int i = 0; i < Model.Questions.Count; i++)
-                {
-                    <div class="card shadow-sm border-0 mt-3" id="question-@Model.Questions[i].Id">
-                        <div class="card-body">
-                            <input type="hidden" asp-for="Questions[i].QuizId" />
-                            <input type="hidden" asp-for="Questions[i].Id" />
-
-                            <label class="form-label fw-bold">Question:</label>
-                            <input type="text" asp-for="Questions[i].Text" class="form-control mb-2" required placeholder="Enter question text" />
-
-                            <label class="form-label fw-bold">Question Type:</label>
-                            <select asp-for="Questions[i].TypeOfQuestion" class="form-select mb-2">
-                                <option value="Text">Text</option>
-                                <option value="Image">Image</option>
-                                <option value="Sound">Sound</option>
-                            </select>
-
-                            <h5 class="mt-3">Answers</h5>
-                            <div id="answers-container-@Model.Questions[i].Id">
-                                @if (Model.Questions[i].Answers.Count > 0)
-                                {
-                                    @for (int j = 0; j < Model.Questions[i].Answers.Count; j++)
-                                    {
-                                        <div class="input-group mt-2" id="answer-@Model.Questions[i].Answers[j].Id">
-                                            <input type="hidden" asp-for="Questions[i].Answers[j].Id" />
-                                            <input type="hidden" asp-for="Questions[i].Answers[j].QuestionId" />
-                                            
-                                            <input type="text" asp-for="Questions[i].Answers[j].Text" class="form-control" required placeholder="Enter answer text" />
-                                            
-                                            <span class="input-group-text">
-                                                <input type="checkbox" asp-for="Questions[i].Answers[j].IsCorrect" class="form-check-input" title="Correct answer" />
-                                            </span>
-
-                                            <button type="button" class="btn btn-danger" onclick="deleteAnswer('@Model.Questions[i].Answers[j].Id', event)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    }
-                                }
-                            </div>
-
-                            <button type="button" class="btn btn-secondary mt-3" onclick="addAnswer(@Model.Questions[i].Id)">
-                                <i class="fas fa-plus"></i> Add Answer
-                            </button>
-
-                            <button type="button" class="btn btn-danger mt-3 float-end" onclick="deleteQuestion('@Model.Questions[i].Id', event)">
-                                <i class="fas fa-trash"></i> Remove Question
-                            </button>
-                        </div>
-                    </div>
-                }
+                ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{i}]";
+                @Html.Partial("_QuestionForm",Model.Questions[i])
             }
         </div>
 
-        <div id="question-container"></div>
-
-        <button type="button" class="btn btn-primary" onclick="addQuestion(@Model.Quiz.Id, event)">
+        @* <button type="button" class="btn btn-primary" onclick="addQuestion(@Model.Quiz.Id, event)">
             <i class="fas fa-plus"></i> Add Question
-        </button>
-        <button type="submit" class="btn btn-success ms-2">
-            <i class="fas fa-save"></i> @(Model.Quiz.Id == 0 ? "Save" : "Update")
-        </button>
+        </button> *@
+        <div class="button-container d-flex justify-content-between align-items-center mb-4">
+            <button type="button" class="btn btn-outline-primary" onclick="addQuestion()">
+                    Dodaj pytanie
+                </button>
+            <button type="submit" class="btn btn-success ms-2">
+                <i class="fas fa-save"></i> @(Model.Quiz.Id == 0 ? "Zapisz" : "Zmień")
+            </button>
+        </div>
 
     </form>
 </div>
@@ -105,83 +53,186 @@
 @section Scripts{
 <script>
 
-    function addQuestion(quizId, event) {
-        event.preventDefault();
-        let questionIndex = document.querySelectorAll(".question").length;
-        let questionHtml = `
-                         <div class="question border p-3 mt-3" id="question-${questionIndex}">
-                            <input type="hidden" name="Questions[${questionIndex}].QuizId" value="${quizId}" />
+    let questionIndex = @Model.Questions.Count;
 
-                            <label>Pytanie:</label>
-                            <input type="text" asp-for="Questions[0].Text" name="Questions[${questionIndex}].Text" class="form-control" required />
+    function addQuestion() {
+        fetch(`/Quiz/GetQuestionForm?index=${questionIndex}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
+                questionIndex++;
+            });
+    };
 
-                            <label>Typ pytania:</label>
-                            <select name="Questions[${questionIndex}].TypeOfQuestion" class="form-control">
-                                <option value="Text">Tekstowe</option>
-                                <option value="Image">Obraz</option>
-                                <option value="Sound">Dźwięk</option>
-                            </select>
+    function addAnswer(button) {
+        const container = button.closest('.question-block').querySelector('.answers-container');
+        const answerIndex = container.children.length;
 
-                            <h4>Odpowiedzi</h4>
-                            <div id="answers-container-${questionIndex}">
-                                <!-- Odpowiedzi będą dodawane tutaj -->
-                            </div>
+        // Szukamy prefixu np. Questions[0]
+        const input = container.closest('.question-block').querySelector('input[name]');
+        const match = input.name.match(/^Questions\[\d+\]/);
+        const prefix = match ? match[0] : '';
 
-                            <button type="button" class="btn btn-secondary mt-2" onclick="addAnswer(${questionIndex})">Dodaj odpowiedź</button>
-                            <button type="button" class="btn btn-danger mt-2" onclick="removeElement('question-${questionIndex}')">Usuń pytanie</button>
-                        </div>
-                `;
-        document.getElementById("question-container").insertAdjacentHTML('beforeend', questionHtml);
-    }
-
-    function addAnswer(questionIndex){
-        console.log(`answers-container-${questionIndex}`)
-        let answersContainer = document.getElementById(`answers-container-${questionIndex}`);
-        let answerIndex = answersContainer.querySelectorAll(".answer").length;
-        let answerHtml = `
-                <div class="answer mt-2" id="answer-${questionIndex}-${answerIndex}">
-                        <input type="text" name="Questions[${questionIndex}].Answers[${answerIndex}].Text" class="form-control" required />
-                        <label>Poprawna odpowiedź?</label>
-                        <input type="hidden" name="Questions[${questionIndex}].Answers[${answerIndex}].QuestionId" value="${questionIndex}" />
-
-                            <input type="checkbox" name="Questions[${questionIndex}].Answers[${answerIndex}].IsCorrect" value="true" />
-                            <input type="hidden" name="Questions[${questionIndex}].Answers[${answerIndex}].IsCorrect" value="false" />
-
-                        <button type="button" class="btn btn-danger" onclick="removeElement('answer-${questionIndex}-${answerIndex}')">Usuń</button>
+        const html = `
+                <div class="answer-block border rounded p-3 mb-2">
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Odpowiedź:</label>
+                        <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control" />
+                        <input type="hidden" name="${prefix}.Answers[${answerIndex}].Id" value="${answerIndex}" />
+                    </div>
+                    <div class="form-check">
+                        <input name="${prefix}.Answers[${answerIndex}].IsCorrect" class="form-check-input" type="checkbox" value="true"/>
+                        <input type="hidden" name="${prefix}.Answers[${answerIndex}].IsCorrect" value="false"/>
+                        <label class="form-check-label">Poprawna</label>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
                 </div>
             `;
-        document.getElementById(`answers-container-${questionIndex}`).insertAdjacentHTML('beforeend', answerHtml);
-    }
 
-    function removeElement(id){
-        console.log(`element id to delete: ${id}`)
-        document.getElementById(id).remove();
-    }
+        container.insertAdjacentHTML('beforeend', html);
+    };
 
-    function deleteQuestion(id,event){
-        event.preventDefault();
-        console.log("delete [id]:" + id);
-        $.ajax({
-            url: `/quiz/deleteQuestion?id=${id}`,
-            type: 'DELETE',
-            success: function (data) {
-                console.log(data.message);
-                    removeElement("question-" + id);
-            }
+    function reindexQuestion(){
+        const questionBlocks = document.querySelectorAll('.question-block');
+        
+        questionBlocks.forEach((qBlock, qIndex) => {
+            replaceInputsName(qBlock, qIndex, 'input[name], textarea[name]', /Questions\[\d+\]/, `Questions[${qIndex}]`)
+
+            const answerBlocks = qBlock.querySelectorAll('.answer-block');
+            answerBlocks.forEach((aBlock, aIndex) => {
+                    replaceInputsName(aBlock, aIndex, 'input[name], textarea[name]', /Questions\[\d+\]\.Answers\[\d+\]/, `Questions[${qIndex}].Answers[${aIndex}]`);
+            });
         });
     }
 
-    function deleteAnswer(id, event) {
-        event.preventDefault();
-        console.log("delete [id]:" + id);
-        $.ajax({
-            url: `/quiz/deleteAnswer?id=${id}`,
-            type: 'DELETE',
-            success: function (data) {
-                console.log(data.message);
-                removeElement("answer-" + id);//answer-id - to id diva zawierajacego element answer
-            }
-        });
+    function replaceInputsName(block,index,s1,s2,s3){
+            const inputs = block.querySelectorAll(s1);
+            inputs.forEach(input => {
+                input.name = input.name.replace(s2, s3);
+            });
+    }
+    function deleteBlock(button, tagName) {
+        const block = button.closest(tagName);
+        block.remove();
+        //reindexQuestion();
+    }
+    function deleteQuestion(button){
+        postDelete(button, '/quiz/deleteQuestion?id=', '.question-block');
+    }
+    function deleteAnswer(button) {
+        postDelete(button, '/quiz/deleteAnswer?id=', '.answer-block');
+    }
+
+    function setFileName(input, index) {
+        if (input.files.length > 0) {
+            document.getElementById(`PathToFile_${index}`).value = input.files[0].name;
+        }
+    }
+
+    function showFilePath(questionId) {
+            const fileContainer = document.getElementById("file-container-" + questionId);
+            console.log(fileContainer);
+            fileContainer.classList.remove("d-none"); // Pokazuje div z polem ścieżki
+            const filePathInput = document.getElementById("file-path-" + questionId);
+
+            /*if (filePath) {
+                filePathInput.value = filePath;
+            } else {
+                fileContainer.classList.add("d-none"); // Ukrywa div, jeśli użytkownik nie podał ścieżki
+            }*/
+        }
+    function hideFilePath(questionId) {
+            const fileContainer = document.getElementById("file-container-" + questionId);
+            const filePathInput = document.getElementById("file-path-" + questionId);
+
+            filePathInput.value = ""; // Czyści pole
+            fileContainer.classList.add("d-none"); // Ukrywa div
+        }
+
+    //  function addQuestion(quizId, event) {
+    //     event.preventDefault();
+    //     const questions = document.querySelectorAll(".question");
+       
+    //     let questionIndex = 0;
+    //     if (questions.length != 0) {
+    //         const lastQuestionId = questions.length != 0 ? questions[questions.length - 1].id : 1;
+    //         const match = lastQuestionId.match(/\d+$/);
+    //         questionIndex = match ? parseInt(match[0], 10) + 1 : null;
+    //     }
+        
+    //     const questionHtml = `
+    //                     <div class="question border p-3 mt-3" id="question-${questionIndex}">
+    //                     <input type="hidden" name="Questions[${questionIndex}].QuizId" value="${quizId}" />
+
+    //                     <label>Pytanie:</label>
+    //                         <input type="text" name="Questions[${questionIndex}].Text" class="form-control mb-2" required placeholder="Enter question text" />
+                                
+    //                         <!-- Przycisk do dodania ścieżki do pliku -->
+    //                             <button type="button" class="btn btn-secondary mt-2" onclick="showFilePath(${questionIndex})">
+    //                             <i class="fas fa-image"></i> Add Image
+    //                         </button>
+
+    //                         <!-- Div z polem ścieżki do pliku (ukryty domyślnie) -->
+    //                             <div id="file-container-${questionIndex}" class="mt-3 d-none">
+    //                             <label class="form-label fw-bold">Image / Audio Path:</label>
+    //                             <div class="input-group">
+    //                                     <input type="file" name="formFiles" class="form-control" placeholder="Enter file path" id="file-path-${questionIndex}" />
+    //                                                     <input type="hidden" name="Questions[${questionIndex}].PathToFile" id="PathToFile_${questionIndex}" />
+
+    //                                             <button type="button" class="btn btn-danger" onclick="hideFilePath(${questionIndex})">
+    //                                     <i class="fas fa-times"></i> Remove
+    //                                 </button>
+    //                             </div>
+    //                         </div>
+
+    //                     <h4>Odpowiedzi</h4>
+    //                     <div id="answers-container-${questionIndex}">
+    //                         <!-- Odpowiedzi będą dodawane tutaj -->
+    //                     </div>
+
+    //                     <button type="button" class="btn btn-secondary mt-2" onclick="addAnswer(${questionIndex})">Dodaj odpowiedź</button>
+    //                     <button type="button" class="btn btn-danger mt-2" onclick="removeElement('question-${questionIndex}')">Usuń pytanie</button>
+    //                 </div>
+    //         `;
+    //     document.getElementById("question-container").insertAdjacentHTML('beforeend', questionHtml);
+        
+    // }
+
+    // function addAnswer(questionIndex){
+    //     console.log(`answers-container-${questionIndex}`)
+    //         const answersContainer = document.getElementById(`answers-container-${questionIndex}`);
+    //         const answerIndex = answersContainer.querySelectorAll(".answer").length;
+    //         const answerHtml = `
+    //             <div class="answer mt-2" id="answer-${questionIndex}-${answerIndex}">
+    //                     <input type="text" name="Questions[${questionIndex}].Answers[${answerIndex}].Text" class="form-control" required />
+    //                     <label>Poprawna odpowiedź?</label>
+    //                     <input type="hidden" name="Questions[${questionIndex}].Answers[${answerIndex}].QuestionId" value="${questionIndex}" />
+
+    //                         <input type="checkbox" name="Questions[${questionIndex}].Answers[${answerIndex}].IsCorrect" value="true" />
+    //                         <input type="hidden" name="Questions[${questionIndex}].Answers[${answerIndex}].IsCorrect" value="false" />
+
+    //                     <button type="button" class="btn btn-danger" onclick="removeElement('answer-${questionIndex}-${answerIndex}')">Usuń</button>
+    //             </div>
+    //         `;
+    //     document.getElementById(`answers-container-${questionIndex}`).insertAdjacentHTML('beforeend', answerHtml);
+    // }
+
+    // function removeElement(id){
+    //     console.log(`element id to delete: ${id}`)
+    //     document.getElementById(id).remove();
+    // }
+
+        //url: `/quiz/deleteAnswer?id=${id}`
+        //url: `/quiz/deleteQuestion?id=${id}`,
+    function postDelete(button, url, tagName) {
+            $.ajax({
+                url: url+button.id,
+                type: 'DELETE',
+                success: function (data) {
+                    console.log(data.message);
+                    deleteBlock(button, tagName);
+                }
+            });
     }
 </script>
 }

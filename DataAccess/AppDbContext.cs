@@ -23,21 +23,18 @@ namespace DataAccess
             {
                 Id = 1,
                 Text = "Pytanie 1",
-                TypeOfQuestion = QuestionType.Text,
                 QuizId = 1,
             };
             var q2 = new Question
             {
                 Id = 2,
                 Text = "Pytanie 2",
-                TypeOfQuestion = QuestionType.Text,
                 QuizId = 1,
             };
             var q3 = new Question
             {
                 Id = 3,
                 Text = "Pytanie 3",
-                TypeOfQuestion = QuestionType.Text,
                 QuizId = 1,
             };
             modelBuilder.Entity<Question>().HasData(q1, q2, q3);

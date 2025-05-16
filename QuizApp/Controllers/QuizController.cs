@@ -3,15 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Models;
 using Models.ViewModels;
+using System.IO;
 
 namespace QuizApp.Controllers
 {
     public class QuizController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public QuizController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public QuizController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         public async Task<IActionResult> Index()
         {
@@ -41,24 +44,38 @@ namespace QuizApp.Controllers
             foreach (var question in questionsToQuiz) {
                 question.Answers = answersAll.Where(x=>x.QuestionId==question.Id).ToList();
             }
-            
+
             var quizVM = new QuizVM()
             {
                 Quiz = quiz,
-                Questions = questionsToQuiz
+                //Questions = questionsToQuiz,
+                Questions = new List<Question>()
             };
+            foreach (var question in questionsToQuiz)
+            {
+                quizVM.Questions.Add(new Question
+                {
+                    Answers = question.Answers,
+                    Id = question.Id,
+                    PathToFile = question.PathToFile,
+                    Text = question.Text,
+                    QuizId = question.QuizId,
+                });
+            }
             return View(quizVM);
         }
 
-        private void AddQuestionsToQuizFromQuizVM(QuizVM quizVM, Quiz quiz)
+        private void AddQuestionsToQuizFromQuizVM(QuizVM quizVM, Quiz quiz, List<IFormFile> formFiles)
         {
-            foreach (var questionVM in quizVM.Questions)
+            for (int i = 0; i < quizVM.Questions.Count; i++)
             {
+                var questionVM = quizVM.Questions[i];
+                var path = "";// SaveFile(questionVM, formFiles.ElementAtOrDefault(i));
+
                 quiz.Questions.Add(new Question
                 {
                     Text = questionVM.Text,
-                    TypeOfQuestion = questionVM.TypeOfQuestion,
-                    PathToFile = questionVM.PathToFile,
+                    PathToFile = path,
                     QuizId = quizVM.Quiz.Id,
                     Answers = questionVM.Answers.Select(a => new Answer
                     {
@@ -69,8 +86,12 @@ namespace QuizApp.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Update(QuizVM quizVM)
+        public async Task<IActionResult> Update(QuizVM quizVM, List<IFormFile> formFiles)
         {
+            foreach (var q in quizVM.Questions)
+            {
+                Console.WriteLine($"Question: {q.Text}, Answers: {q.Answers.Count}");
+            }
             if (ModelState.IsValid)
             {
                 //nowy quiz
@@ -80,10 +101,9 @@ namespace QuizApp.Controllers
                     if (quizVM.Questions.Count != 0)
                     {
                         quiz.Questions=new List<Question>();
-                        foreach (var questionVM in quizVM.Questions)
-                        {
-                            AddQuestionsToQuizFromQuizVM(quizVM, quiz);
-                        }
+
+                        AddQuestionsToQuizFromQuizVM(quizVM, quiz, formFiles);
+                        
                     }
                         _unitOfWork.Quizzes.Update(quiz);
                     return RedirectToAction(nameof(Index));
@@ -104,33 +124,45 @@ namespace QuizApp.Controllers
                     {
 
                         questionFromDb.Text = questionVM.Text;
-                        questionFromDb.TypeOfQuestion = questionVM.TypeOfQuestion;
-                        questionFromDb.PathToFile = questionVM.PathToFile;
-
+                        //questionFromDb.PathToFile = SaveFile(questionVM, formFiles[0]);
 
                         foreach (var answerVM in questionVM.Answers)
                         {
-                            var answerFromDb = questionFromDb.Answers.FirstOrDefault(a => a.Id == answerVM.Id);
-                            if (answerFromDb != null)
+                            if (!string.IsNullOrEmpty(answerVM.Text))
                             {
-                                // Jeśli odpowiedź istnieje -> aktualizuj
-                                answerFromDb.Text = answerVM.Text;
-                                answerFromDb.IsCorrect = answerVM.IsCorrect;
-                            }
-                            else
-                            {
-                                // Jeśli odpowiedzi NIE ma -> dodaj nową
-                                questionVM.Answers.Add(new Answer
+                                var answerFromDb = questionFromDb.Answers.FirstOrDefault(a => a.Id == answerVM.Id);
+                                if (answerFromDb != null)
                                 {
-                                    Text = answerVM.Text,
-                                    IsCorrect = answerVM.IsCorrect
-                                });
+                                    // Jeśli odpowiedź istnieje -> aktualizuj
+                                    answerFromDb.Text = answerVM.Text;
+                                    answerFromDb.IsCorrect = answerVM.IsCorrect;
+                                }
+                                else
+                                {
+                                    // Jeśli odpowiedzi NIE ma -> dodaj nową
+                                    questionFromDb.Answers.Add(new Answer
+                                    {
+                                        Text = answerVM.Text,
+                                        IsCorrect = answerVM.IsCorrect
+                                    });
+                                }
                             }
                         }
                     }
                     else
                     {
-                        AddQuestionsToQuizFromQuizVM(quizVM, quizFromDb);
+                        var newQuestion = new Question
+                        {
+                            Text = questionVM.Text,
+                            PathToFile = "",
+                            QuizId = quizVM.Quiz.Id,
+                            Answers = questionVM.Answers.Select(a => new Answer
+                            {
+                                Text = a.Text,
+                                IsCorrect = a.IsCorrect
+                            }).ToList()
+                        };
+                        quizFromDb.Questions.Add(newQuestion);
                     }
                 }
                 _unitOfWork.Quizzes.Update(quizFromDb);
@@ -139,6 +171,64 @@ namespace QuizApp.Controllers
             return RedirectToAction("Update",quizVM.Quiz.Id);
         }
 
+        public IActionResult GetQuestionForm(int index)
+        {
+            var newQuestion = new Question
+            {
+                Answers = new List<Answer>() // możesz też dodać pustą listę
+            };
+
+            ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{index}]";
+            return PartialView("_QuestionForm", newQuestion);
+        }
+
+        #region files
+        private void DeleteOld(string filePath)
+        {
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            var oldImgPath = Path.Combine(
+                            wwwRootPath, filePath.TrimStart('/'));
+            
+            if (System.IO.File.Exists(oldImgPath))
+            {
+                System.IO.File.Delete(oldImgPath);
+            }
+        }
+        private string SaveFile(Question question, IFormFile formFile)
+        {
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            if (formFile.FileName != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);
+                string questionPath = Path.Combine(wwwRootPath, @"images\question");
+                
+                if (!Directory.Exists(questionPath))
+                {
+                    Directory.CreateDirectory(questionPath);
+                }
+
+                if (!string.IsNullOrEmpty(question.PathToFile))
+                {
+                    DeleteOld(question.PathToFile);
+                }
+                try
+                {
+                    using (var fileStream = new FileStream(Path.Combine(questionPath, fileName), FileMode.Create))
+                    {
+                        formFile.CopyTo(fileStream);
+                        //question.PathToFile.CopyTo(fileStream);
+                    }
+                    return $"/images/question/{fileName}";
+                }
+                catch (Exception ex)
+                {
+                    // logowanie błędu np. _logger.LogError(ex, "Błąd przy zapisie pliku");
+                    return string.Empty;
+                }
+            }
+            return string.Empty;
+        }
+        #endregion
 
         #region api
         [HttpDelete]

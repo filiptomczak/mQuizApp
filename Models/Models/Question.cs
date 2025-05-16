@@ -10,18 +10,11 @@ namespace Models.Models
         public int Id { get; set; }
         [Required]
         public string? Text { get; set; }
-        public QuestionType? TypeOfQuestion { get; set; }
         public string? PathToFile{ get; set; }
         public int QuizId { get; set; }
         [ForeignKey("QuizId")]
         [ValidateNever]
         public Quiz? Quiz { get; set; }
         public List<Answer> Answers { get; set; } = new List<Answer>();
-    }
-    public enum QuestionType
-    {
-        Text,
-        Image,
-        Sound,
     }
 }
