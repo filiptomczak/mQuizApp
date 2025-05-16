@@ -175,7 +175,8 @@ namespace QuizApp.Controllers
         {
             var newQuestion = new Question
             {
-                Answers = new List<Answer>() // możesz też dodać pustą listę
+                Id=index,
+                Answers = new List<Answer>() // możesz też dodać pustą listę             
             };
 
             ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{index}]";
