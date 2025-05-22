@@ -79,8 +79,10 @@
                         <input type="hidden" name="${prefix}.Answers[${answerIndex}].Id" value="${answerIndex}" />
                     </div>
                     <div class="form-check">
+
                         <input name="${prefix}.Answers[${answerIndex}].IsCorrect" class="form-check-input" type="checkbox" value="true"/>
                         <input type="hidden" name="${prefix}.Answers[${answerIndex}].IsCorrect" value="false"/>
+
                         <label class="form-check-label">Poprawna</label>
                     </div>
                     <button type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
@@ -90,13 +92,6 @@
         container.insertAdjacentHTML('beforeend', html);
     };
 
-
-    function replaceInputsName(block,index,s1,s2,s3){
-            const inputs = block.querySelectorAll(s1);
-            inputs.forEach(input => {
-                input.name = input.name.replace(s2, s3);
-            });
-    }
     function deleteQuestion(button){
         postDelete(button, '/quiz/deleteQuestion?id=', '.question-block');
     }

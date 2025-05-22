@@ -1,4 +1,4 @@
-﻿@model Question
+﻿@model QuestionVM
 
 @{
     var prefix = ViewData.TemplateInfo.HtmlFieldPrefix;
@@ -7,14 +7,21 @@
 <div class="question-block card mb-3" id="question-@prefix">
     <div class="card-body">
         <div class="mb-3">
-            <label asp-for="Text" class="form-label fw-bold">Pytanie:</label>
-            <input asp-for="Text" class="form-control" />
-            <input asp-for="PathToFile" class="form-control" type="file" accept=".jpg,.png,.bmp,.jpeg" />
-            @if(!string.IsNullOrEmpty(Model.PathToFile))
             @if (Model.Id != 0)
             {
                 <input type="hidden" asp-for="Id" />
+                @* <input type="hidden" name="@($"{prefix}.QuizId")" value="@Model.QuizId" /> *@
             }
+
+            <label asp-for="Text" class="form-label fw-bold">Pytanie:</label>
+            <input asp-for="Text" class="form-control" />
+            <input asp-for="UploadedFile" class="form-control" type="file" accept=".jpg,.png,.bmp,.jpeg" />
+            @if (!string.IsNullOrEmpty(Model.PathToFile))
+            {
+            <img src="@Model.PathToFile"/>   
+            }
+
+
         </div>
         <!-- Question Answers -->
         <div class="answers-container">
@@ -31,8 +38,9 @@
                         <input asp-for="@Model.Answers[j].Text" class="form-control"/>
                     </div>
                     <div class="form-check">
-                        <input asp-for="@Model.Answers[j].IsCorrect" type="checkbox"/>
-                        <input type="hidden" name="@($"{prefix}.Answers[{j}].IsCorrect")" value="false" /> 
+                        <input asp-for="@Model.Answers[j].IsCorrect" type="checkbox" />
+
+                        <input type="hidden" name="@($"{prefix}.Answers[{j}].IsCorrect")" value="false" />
                         <label class="form-check-label">Poprawna</label>
                     </div>
                     <button id="@Model.Answers[j].Id"  type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
