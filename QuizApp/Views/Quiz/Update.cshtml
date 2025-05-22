@@ -35,9 +35,6 @@
             }
         </div>
 
-        @* <button type="button" class="btn btn-primary" onclick="addQuestion(@Model.Quiz.Id, event)">
-            <i class="fas fa-plus"></i> Add Question
-        </button> *@
         <div class="button-container d-flex justify-content-between align-items-center mb-4">
             <button type="button" class="btn btn-outline-primary" onclick="addQuestion()">
                     Dodaj pytanie
@@ -60,6 +57,7 @@
             .then(res => res.text())
             .then(html => {
                 document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
+                    document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
                 questionIndex++;
             });
     };
@@ -74,7 +72,7 @@
         const prefix = match ? match[0] : '';
 
         const html = `
-                <div class="answer-block border rounded p-3 mb-2">
+                <div class="answer-block border rounded p-3 mb-2" data-new="true"">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Odpowiedź:</label>
                         <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control" />
@@ -98,10 +96,6 @@
             inputs.forEach(input => {
                 input.name = input.name.replace(s2, s3);
             });
-    }
-    function deleteBlock(button, tagName) {
-        const block = button.closest(tagName);
-        block.remove();
     }
     function deleteQuestion(button){
         postDelete(button, '/quiz/deleteQuestion?id=', '.question-block');
@@ -136,14 +130,21 @@
         }
 
     function postDelete(button, url, tagName) {
+        const block = button.closest(tagName);
+        if (block.dataset.new === "true") {
+            block.remove();
+            console.log('deleted')
+        } else {
             $.ajax({
-                url: url+button.id,
+                url: url + button.id,
                 type: 'DELETE',
                 success: function (data) {
                     console.log(data.message);
-                    deleteBlock(button, tagName);
+                    block.remove()
                 }
             });
+        }
+       
     }
 </script>
 }

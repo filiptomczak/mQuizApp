@@ -4,12 +4,17 @@
     var prefix = ViewData.TemplateInfo.HtmlFieldPrefix;
 }
 
-<div class="question-block card mb-3">
+<div class="question-block card mb-3" id="question-@prefix">
     <div class="card-body">
         <div class="mb-3">
             <label asp-for="Text" class="form-label fw-bold">Pytanie:</label>
             <input asp-for="Text" class="form-control" />
-            <input type="hidden" asp-for="Id" />
+            <input asp-for="PathToFile" class="form-control" type="file" accept=".jpg,.png,.bmp,.jpeg" />
+            @if(!string.IsNullOrEmpty(Model.PathToFile))
+            @if (Model.Id != 0)
+            {
+                <input type="hidden" asp-for="Id" />
+            }
         </div>
         <!-- Question Answers -->
         <div class="answers-container">
@@ -18,14 +23,14 @@
                 var answerPrefix = $"{prefix}.Answers[{j}]";
                 <div class="answer-block border rounded p-3 mb-2">
                     <div class="mb-2">
+                        @if (Model.Answers[j].Id != 0)
+                        {
+                            <input asp-for="@Model.Answers[j].Id" type="hidden" />
+                        }
                         <label class="form-label fw-bold">Odpowiedź:</label>
                         <input asp-for="@Model.Answers[j].Text" class="form-control"/>
-                        <input asp-for="@Model.Answers[j].Id" type="hidden" />
-                        @* <input name="@($"{prefix}.Answers[{j}].Text")" class="form-control" /> *@
-                        @* <input type="hidden" name="@($"{prefix}.Answers[{j}].Id")" value="@Model.Answers[j].Id" /> *@
                     </div>
                     <div class="form-check">
-                        @* <input name="@($"{prefix}.Answers[{j}].IsCorrect")" class="form-check-input" type="checkbox" value="true" />*@
                         <input asp-for="@Model.Answers[j].IsCorrect" type="checkbox"/>
                         <input type="hidden" name="@($"{prefix}.Answers[{j}].IsCorrect")" value="false" /> 
                         <label class="form-check-label">Poprawna</label>

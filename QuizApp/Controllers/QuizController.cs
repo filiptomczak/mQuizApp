@@ -88,10 +88,7 @@ namespace QuizApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(QuizVM quizVM, List<IFormFile> formFiles)
         {
-            foreach (var q in quizVM.Questions)
-            {
-                Console.WriteLine($"Question: {q.Text}, Answers: {q.Answers.Count}");
-            }
+
             if (ModelState.IsValid)
             {
                 //nowy quiz
@@ -124,7 +121,9 @@ namespace QuizApp.Controllers
                     {
 
                         questionFromDb.Text = questionVM.Text;
-                        //questionFromDb.PathToFile = SaveFile(questionVM, formFiles[0]);
+
+                        //var formFile = formFiles.FirstOrDefault(x => x.FileName == questionFromDb
+                        questionFromDb.PathToFile = SaveFile(questionVM, formFiles[0]);
 
                         foreach (var answerVM in questionVM.Answers)
                         {
@@ -176,7 +175,7 @@ namespace QuizApp.Controllers
             var newQuestion = new Question
             {
                 Id=index,
-                Answers = new List<Answer>() // możesz też dodać pustą listę             
+                Answers = new List<Answer>()     
             };
 
             ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{index}]";
