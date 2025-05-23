@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Models;
 using System.Diagnostics;
 
-namespace QuizApp.Controllers
+namespace QuizApp.Areas.User.Controllers
 {
+    [Area("User")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

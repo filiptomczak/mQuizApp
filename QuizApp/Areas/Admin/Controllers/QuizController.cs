@@ -5,8 +5,9 @@ using Models.Models;
 using Models.ViewModels;
 using System.IO;
 
-namespace QuizApp.Controllers
+namespace QuizApp.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class QuizController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -20,7 +21,8 @@ namespace QuizApp.Controllers
         {
             var quizes = await _unitOfWork.Quizzes.GetAllAsync();
             var questions = await _unitOfWork.Questions.GetAllAsync();
-            foreach (var quiz in quizes) {
+            foreach (var quiz in quizes)
+            {
                 quiz.Questions = questions.Where(q => q.QuizId == quiz.Id).ToList();
             }
             return View(quizes);
@@ -28,7 +30,7 @@ namespace QuizApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            if(id == 0)
+            if (id == 0)
             {
                 var newQuiz = new QuizVM()
                 {
@@ -38,11 +40,12 @@ namespace QuizApp.Controllers
             }
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
             var questionsAll = await _unitOfWork.Questions.GetAllAsync();
-            var questionsToQuiz = questionsAll.Where(x=>x.QuizId==quiz.Id).ToList();
+            var questionsToQuiz = questionsAll.Where(x => x.QuizId == quiz.Id).ToList();
             var answersAll = await _unitOfWork.Answers.GetAllAsync();
 
-            foreach (var question in questionsToQuiz) {
-                question.Answers = answersAll.Where(x=>x.QuestionId==question.Id).ToList();
+            foreach (var question in questionsToQuiz)
+            {
+                question.Answers = answersAll.Where(x => x.QuestionId == question.Id).ToList();
             }
 
             var quizVM = new QuizVM()
@@ -98,14 +101,14 @@ namespace QuizApp.Controllers
                 {
                     if (quizVM.Questions.Count != 0)
                     {
-                        AddQuestionsToQuizFromQuizVM(quizVM);                        
+                        AddQuestionsToQuizFromQuizVM(quizVM);
                     }
                     _unitOfWork.Quizzes.Update(quizVM.Quiz);
                     return RedirectToAction(nameof(Index));
                 }
 
                 //edycja quizu
-                var quizFromDb = _unitOfWork.Quizzes.Get(x=>x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
+                var quizFromDb = _unitOfWork.Quizzes.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
 
                 //brak quizu w db
                 if (quizFromDb == null)
@@ -117,7 +120,7 @@ namespace QuizApp.Controllers
                 quizFromDb.Title = quizVM.Quiz.Title;
                 quizFromDb.Description = quizVM.Quiz.Description;
 
-                //update pytan
+                //nowe lub update pytan
                 foreach (var questionVM in quizVM.Questions)
                 {
                     var questionFromDb = quizFromDb.Questions.FirstOrDefault(x => x.Id == questionVM.Id);
@@ -127,6 +130,10 @@ namespace QuizApp.Controllers
                         questionFromDb.Text = questionVM.Text;
                         if (questionVM.UploadedFile != null)
                         {
+                            if (!string.IsNullOrEmpty(questionFromDb.PathToFile))
+                            {
+                                DeleteOld(questionFromDb.PathToFile);
+                            }
                             questionFromDb.PathToFile = SaveFile(questionVM);
                         }
                         //update odpowiedzi
@@ -144,7 +151,7 @@ namespace QuizApp.Controllers
                                 }
                                 // jesli nie ma odp w db, tworzymy nowa 
                                 else
-                                {                                    
+                                {
                                     questionFromDb.Answers.Add(new Answer
                                     {
                                         Text = answerVM.Text,
@@ -160,7 +167,7 @@ namespace QuizApp.Controllers
                         var newQuestion = new Question
                         {
                             Text = questionVM.Text,
-                            PathToFile = questionVM.PathToFile,
+                            PathToFile = SaveFile(questionVM),
                             QuizId = quizVM.Quiz.Id,
                             Answers = questionVM.Answers.Select(a => new Answer
                             {
@@ -174,15 +181,15 @@ namespace QuizApp.Controllers
                 _unitOfWork.Quizzes.Update(quizFromDb);
                 return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction("Update",quizVM.Quiz.Id);
+            return RedirectToAction("Update", quizVM.Quiz.Id);
         }
 
         public IActionResult GetQuestionForm(int index)
         {
             var newQuestion = new QuestionVM
             {
-                Id=index,
-                Answers = new List<Answer>()     
+                Id = index,
+                Answers = new List<Answer>()
             };
 
             ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{index}]";
@@ -190,12 +197,13 @@ namespace QuizApp.Controllers
         }
 
         #region files
+
         private void DeleteOld(string filePath)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             var oldImgPath = Path.Combine(
                             wwwRootPath, filePath.TrimStart('/'));
-            
+
             if (System.IO.File.Exists(oldImgPath))
             {
                 System.IO.File.Delete(oldImgPath);
@@ -206,24 +214,27 @@ namespace QuizApp.Controllers
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             if (question.UploadedFile.FileName != null)
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(question.UploadedFile.FileName);
+                string fileName = DateTime.Now.Year + "_" +
+                    DateTime.Now.Month + "_" +
+                    DateTime.Now.Day + "_" +
+                    DateTime.Now.Hour + "_" +
+                    DateTime.Now.Minute + "_" +
+                    DateTime.Now.Second + "_" +
+                    question.UploadedFile.FileName;
+
                 string questionPath = Path.Combine(wwwRootPath, @"images\question");
-                
+
                 if (!Directory.Exists(questionPath))
                 {
                     Directory.CreateDirectory(questionPath);
                 }
 
-                if (!string.IsNullOrEmpty(question.PathToFile))
-                {
-                    DeleteOld(question.PathToFile);
-                }
+
                 try
                 {
                     using (var fileStream = new FileStream(Path.Combine(questionPath, fileName), FileMode.Create))
                     {
                         question.UploadedFile.CopyTo(fileStream);
-                        //question.PathToFile.CopyTo(fileStream);
                     }
                     return $"/images/question/{fileName}";
                 }
@@ -239,7 +250,8 @@ namespace QuizApp.Controllers
 
         #region api
         [HttpDelete]
-        public async Task<IActionResult> Delete(int id) {
+        public async Task<IActionResult> Delete(int id)
+        {
             var entity = await _unitOfWork.Quizzes.GetByIdAsync(id);
             _unitOfWork.Quizzes.Delete(entity);
             return Json(new
@@ -248,7 +260,7 @@ namespace QuizApp.Controllers
                 message = "Quiz Succesfully Deleted",
             });
         }
-        
+
         [HttpDelete]
         public async Task<IActionResult> DeleteQuestion(int id)
         {
@@ -270,6 +282,22 @@ namespace QuizApp.Controllers
             {
                 success = true,
                 message = "Answer Succesfully Deleted",
+            });
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteImage(int id)
+        {
+            var entity = await _unitOfWork.Questions.GetByIdAsync(id);
+            if (!string.IsNullOrEmpty(entity.PathToFile))
+            {
+                DeleteOld(entity.PathToFile);
+                entity.PathToFile = null;
+            }
+            await _unitOfWork.CommitAsync();
+            return Json(new
+            {
+                success = true,
+                message = "Image Succesfully Deleted",
             });
         }
         #endregion

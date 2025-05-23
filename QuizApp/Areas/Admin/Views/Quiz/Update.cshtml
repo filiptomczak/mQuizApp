@@ -75,7 +75,7 @@
                 <div class="answer-block border rounded p-3 mb-2" data-new="true"">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Odpowiedź:</label>
-                        <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control" />
+                        <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control"/>
                         <input type="hidden" name="${prefix}.Answers[${answerIndex}].Id" value="${answerIndex}" />
                     </div>
                     <div class="form-check">
@@ -92,38 +92,46 @@
         container.insertAdjacentHTML('beforeend', html);
     };
 
+        
+
     function deleteQuestion(button){
         postDelete(button, '/quiz/deleteQuestion?id=', '.question-block');
     }
     function deleteAnswer(button) {
         postDelete(button, '/quiz/deleteAnswer?id=', '.answer-block');
     }
+    function deleteImage(button) {
+        postDelete(button, '/quiz/deleteImage?id=', '.image-block');
+    }
 
-    function setFileName(input, index) {
-        if (input.files.length > 0) {
-            document.getElementById(`PathToFile_${index}`).value = input.files[0].name;
+    function toggleFileInput(button) {
+        const fileInputDiv = button.closest('.question-block').querySelector('.file-upload');
+        if (fileInputDiv) {
+            fileInputDiv.classList.toggle('d-none');
+            const fileInput = fileInputDiv.querySelector('input[type="file"]');
+            if (fileInput) {
+                if (!fileInputDiv.classList.contains('d-none')) {                 
+                    fileInput.click(); // Symuluje kliknięcie inputa file
+                } else {
+                    fileInput.value = '';
+                }
+            }
         }
     }
-    function showFilePath(questionId) {
-            const fileContainer = document.getElementById("file-container-" + questionId);
-            console.log(fileContainer);
-            fileContainer.classList.remove("d-none"); // Pokazuje div z polem ścieżki
-            const filePathInput = document.getElementById("file-path-" + questionId);
-
-            /*if (filePath) {
-                filePathInput.value = filePath;
-            } else {
-                fileContainer.classList.add("d-none"); // Ukrywa div, jeśli użytkownik nie podał ścieżki
-            }*/
+    function previewImage(input) {
+        const file = input.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const container = input.closest('.question-block');
+                const previewDiv = container.querySelector('.image-block');
+                const img = previewDiv.querySelector('img');
+                img.src = e.target.result;
+                previewDiv.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
         }
-    function hideFilePath(questionId) {
-            const fileContainer = document.getElementById("file-container-" + questionId);
-            const filePathInput = document.getElementById("file-path-" + questionId);
-
-            filePathInput.value = ""; // Czyści pole
-            fileContainer.classList.add("d-none"); // Ukrywa div
-        }
-
+    }
     function postDelete(button, url, tagName) {
         const block = button.closest(tagName);
         if (block.dataset.new === "true") {
@@ -142,4 +150,12 @@
        
     }
 </script>
+
+    @* <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons   table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
+        });
+    </script> *@
 }

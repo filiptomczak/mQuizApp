@@ -12,13 +12,28 @@
                 <input type="hidden" asp-for="Id" />
                 @* <input type="hidden" name="@($"{prefix}.QuizId")" value="@Model.QuizId" /> *@
             }
+            <label class="form-label fw-bold">Pytanie:</label>
 
-            <label asp-for="Text" class="form-label fw-bold">Pytanie:</label>
-            <input asp-for="Text" class="form-control" />
-            <input asp-for="UploadedFile" class="form-control" type="file" accept=".jpg,.png,.bmp,.jpeg" />
+            <div class="input-group mb-2 position-relative">
+
+                <input asp-for="Text" class="form-control" placeholder="Wpisz pytanie..." />
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleFileInput(this)">
+                    <i class="fa-regular fa-image"></i> Dodaj obraz
+                </button>
+            </div>
+            <div class="mb-3 file-upload d-none">
+                <input asp-for="UploadedFile" class="form-control" type="file" accept=".jpg,.png,.bmp,.jpeg" placeholder="Wybierz obraz..." onchange="previewImage(this)"/>
+            </div>
+
             @if (!string.IsNullOrEmpty(Model.PathToFile))
-            {
-            <img src="@Model.PathToFile"/>   
+            {        
+                <div class="image-block">
+
+                    <img src="@Model.PathToFile" class="img-thumbnail"  width="400"/>
+                    <button id="@Model.Id" class="btn btn-outline-danger" type="button" onclick="deleteImage(this)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
             }
 
 
