@@ -48,19 +48,20 @@ namespace DataAccess.Repo
             return await _set.FindAsync(id);
         }
         public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        {
+            IQueryable<T> query = _set.Where(filter);
+            if (!string.IsNullOrEmpty(includeProperties))
             {
-                IQueryable<T> query = _set.Where(filter);
-
-                if (!string.IsNullOrEmpty(includeProperties))
+                foreach (var prop in includeProperties
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries))
                 {
-                    foreach (var prop in includeProperties
-                        .Split(',', StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        query = query.Include(prop);
-                    }
+
+                            query = query.Include(prop);
                 }
-                return query.FirstOrDefault();
             }
+            return query.FirstOrDefault();
+        }
+        
         public void Update(T entity)
         {
             _set.Update(entity);

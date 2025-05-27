@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //builder.Services.AddScoped<IBaseRepository<Answer>, BaseRepository<Answer>>();
 //builder.Services.AddScoped<IBaseRepository<Quiz>, BaseRepository<Quiz>>();

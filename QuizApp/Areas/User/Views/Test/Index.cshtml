@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Quiz>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Dostępne testy</h2>
+    </div>
+
+    <div class="row">
+        @foreach (var quiz in Model)
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4" id="quiz-@quiz.Id">
+                <div class="card shadow-lg border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-dark">@quiz.Title</h5>
+                        <p class="card-text text-muted">@quiz.Description</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between">
+                            <a asp-action="TakeTest" asp-route-id="@quiz.Id" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-edit"></i> Start
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        
+    </script>
+}

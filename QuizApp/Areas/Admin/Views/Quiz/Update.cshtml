@@ -53,11 +53,11 @@
     let questionIndex = @Model.Questions.Count;
 
     function addQuestion() {
-        fetch(`/Quiz/GetQuestionForm?index=${questionIndex}`)
+        fetch(`/Admin/Quiz/GetQuestionForm?index=${questionIndex}`)
             .then(res => res.text())
             .then(html => {
                 document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
-                    document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
+                document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
                 questionIndex++;
             });
     };
@@ -95,13 +95,13 @@
         
 
     function deleteQuestion(button){
-        postDelete(button, '/quiz/deleteQuestion?id=', '.question-block');
+            postDelete(button, '/Admin/quiz/deleteQuestion?id=', '.question-block');
     }
     function deleteAnswer(button) {
-        postDelete(button, '/quiz/deleteAnswer?id=', '.answer-block');
+            postDelete(button, '/Admin/quiz/deleteAnswer?id=', '.answer-block');
     }
     function deleteImage(button) {
-        postDelete(button, '/quiz/deleteImage?id=', '.image-block');
+            postDelete(button, '/Admin/quiz/deleteImage?id=', '.image-block');
     }
 
     function toggleFileInput(button) {

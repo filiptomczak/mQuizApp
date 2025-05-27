@@ -212,7 +212,7 @@ namespace QuizApp.Areas.Admin.Controllers
         private string SaveFile(QuestionVM question)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
-            if (question.UploadedFile.FileName != null)
+            if (question.UploadedFile != null)
             {
                 string fileName = DateTime.Now.Year + "_" +
                     DateTime.Now.Month + "_" +
