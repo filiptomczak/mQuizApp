@@ -7,6 +7,6 @@ namespace Models.ViewModels
     {
         public int QuizId { get; set; }
         public string Title { get; set; }
-        public IEnumerable<TestResult> TopResults { get; set; }
+        public IEnumerable<TestResult> Results { get; set; }
     }
 }
