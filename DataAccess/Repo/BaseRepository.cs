@@ -44,11 +44,24 @@ namespace DataAccess.Repo
         }
 
         public async Task<T> GetByIdAsync(int id)
-        {
-            return await _set.FindAsync(id); ;
-
+        {            
+            return await _set.FindAsync(id);
         }
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        {
+            IQueryable<T> query = _set.Where(filter);
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var prop in includeProperties
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries))
+                {
 
+                            query = query.Include(prop);
+                }
+            }
+            return query.FirstOrDefault();
+        }
+        
         public void Update(T entity)
         {
             _set.Update(entity);

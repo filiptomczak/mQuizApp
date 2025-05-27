@@ -9,6 +9,7 @@ namespace DataAccess.IRepo
 {
     public interface IBaseRepository<T> where T : class
     {
+        T Get(Expression<Func<T, bool>> filter, string? includeProperties = null);
         Task<T> GetByIdAsync(int id);
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> FindAsync(Expression<Func<T, bool>> predicate);

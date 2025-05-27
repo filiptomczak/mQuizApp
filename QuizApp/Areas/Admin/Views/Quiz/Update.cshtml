@@ -1,0 +1,161 @@
+﻿@model QuizVM
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            @(Model.Quiz.Id == 0 ? "Stwórz nowy quiz" : "Edytuj quiz")
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-primary ms-2">
+            <i class="fas fa-home"></i> Powrót
+        </a>
+    </div>
+        
+    <form method="post" enctype="multipart/form-data">
+        <input asp-for="Quiz.Id" type="hidden" />
+
+        <!-- Quiz Title -->
+        <div class="mb-3">
+            <label asp-for="Quiz.Title" class="form-label fw-bold">Quiz Title</label>
+            <input asp-for="Quiz.Title" type="text" class="form-control" placeholder="Enter quiz title" required />
+            <span asp-validation-for="Quiz.Title" class="text-danger"></span>
+        </div>
+
+        <!-- Quiz Description -->
+        <div class="mb-3">
+            <label asp-for="Quiz.Description" class="form-label fw-bold">Description</label>
+            <input asp-for="Quiz.Description" type="text" class="form-control" placeholder="Enter quiz description" required />
+            <span asp-validation-for="Quiz.Description" class="text-danger"></span>
+        </div>
+        <!-- Quiz Questions -->
+        <div id="question-container">
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{i}]";
+                @Html.Partial("_QuestionForm",Model.Questions[i])
+            }
+        </div>
+
+        <div class="button-container d-flex justify-content-between align-items-center mb-4">
+            <button type="button" class="btn btn-outline-primary" onclick="addQuestion()">
+                    Dodaj pytanie
+                </button>
+            <button type="submit" class="btn btn-success ms-2">
+                <i class="fas fa-save"></i> @(Model.Quiz.Id == 0 ? "Zapisz" : "Zmień")
+            </button>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts{
+<script>
+
+    let questionIndex = @Model.Questions.Count;
+
+    function addQuestion() {
+        fetch(`/Admin/Quiz/GetQuestionForm?index=${questionIndex}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
+                document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
+                questionIndex++;
+            });
+    };
+
+    function addAnswer(button) {
+        const container = button.closest('.question-block').querySelector('.answers-container');
+        const answerIndex = container.children.length;
+
+        // Szukamy prefixu np. Questions[0]
+        const input = container.closest('.question-block').querySelector('input[name]');
+        const match = input.name.match(/^Questions\[\d+\]/);
+        const prefix = match ? match[0] : '';
+
+        const html = `
+                <div class="answer-block border rounded p-3 mb-2" data-new="true"">
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Odpowiedź:</label>
+                        <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control"/>
+                        <input type="hidden" name="${prefix}.Answers[${answerIndex}].Id" value="${answerIndex}" />
+                    </div>
+                    <div class="form-check">
+
+                        <input name="${prefix}.Answers[${answerIndex}].IsCorrect" class="form-check-input" type="checkbox" value="true"/>
+                        <input type="hidden" name="${prefix}.Answers[${answerIndex}].IsCorrect" value="false"/>
+
+                        <label class="form-check-label">Poprawna</label>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
+                </div>
+            `;
+
+        container.insertAdjacentHTML('beforeend', html);
+    };
+
+        
+
+    function deleteQuestion(button){
+            postDelete(button, '/Admin/quiz/deleteQuestion?id=', '.question-block');
+    }
+    function deleteAnswer(button) {
+            postDelete(button, '/Admin/quiz/deleteAnswer?id=', '.answer-block');
+    }
+    function deleteImage(button) {
+            postDelete(button, '/Admin/quiz/deleteImage?id=', '.image-block');
+    }
+
+    function toggleFileInput(button) {
+        const fileInputDiv = button.closest('.question-block').querySelector('.file-upload');
+        if (fileInputDiv) {
+            fileInputDiv.classList.toggle('d-none');
+            const fileInput = fileInputDiv.querySelector('input[type="file"]');
+            if (fileInput) {
+                if (!fileInputDiv.classList.contains('d-none')) {                 
+                    fileInput.click(); // Symuluje kliknięcie inputa file
+                } else {
+                    fileInput.value = '';
+                }
+            }
+        }
+    }
+    function previewImage(input) {
+        const file = input.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const container = input.closest('.question-block');
+                const previewDiv = container.querySelector('.image-block');
+                const img = previewDiv.querySelector('img');
+                img.src = e.target.result;
+                previewDiv.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    function postDelete(button, url, tagName) {
+        const block = button.closest(tagName);
+        if (block.dataset.new === "true") {
+            block.remove();
+            console.log('deleted')
+        } else {
+            $.ajax({
+                url: url + button.id,
+                type: 'DELETE',
+                success: function (data) {
+                    console.log(data.message);
+                    block.remove()
+                }
+            });
+        }
+       
+    }
+</script>
+
+    @* <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons   table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
+        });
+    </script> *@
+}

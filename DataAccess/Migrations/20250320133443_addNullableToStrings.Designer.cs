@@ -3,6 +3,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250320133443_addNullableToStrings")]
+    partial class addNullableToStrings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,6 +66,9 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TypeOfQuestion")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
@@ -74,19 +80,22 @@ namespace DataAccess.Migrations
                         {
                             Id = 1,
                             QuizId = 1,
-                            Text = "Pytanie 1"
+                            Text = "Pytanie 1",
+                            TypeOfQuestion = 0
                         },
                         new
                         {
                             Id = 2,
                             QuizId = 1,
-                            Text = "Pytanie 2"
+                            Text = "Pytanie 2",
+                            TypeOfQuestion = 0
                         },
                         new
                         {
                             Id = 3,
                             QuizId = 1,
-                            Text = "Pytanie 3"
+                            Text = "Pytanie 3",
+                            TypeOfQuestion = 0
                         });
                 });
 
@@ -116,29 +125,6 @@ namespace DataAccess.Migrations
                             Description = "Sprawdzamy wiedzę ogólną",
                             Title = "Test wiedzy ogólnej"
                         });
-                });
-
-            modelBuilder.Entity("Models.Models.TestResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Points")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Results");
                 });
 
             modelBuilder.Entity("Models.Models.Answer", b =>

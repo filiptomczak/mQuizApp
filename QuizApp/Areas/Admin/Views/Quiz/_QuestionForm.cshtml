@@ -1,0 +1,73 @@
+﻿@model QuestionVM
+
+@{
+    var prefix = ViewData.TemplateInfo.HtmlFieldPrefix;
+}
+
+<div class="question-block card mb-3" id="question-@prefix">
+    <div class="card-body">
+        <div class="mb-3">
+            @if (Model.Id != 0)
+            {
+                <input type="hidden" asp-for="Id" />
+                @* <input type="hidden" name="@($"{prefix}.QuizId")" value="@Model.QuizId" /> *@
+            }
+            <label class="form-label fw-bold">Pytanie:</label>
+
+            <div class="input-group mb-2 position-relative">
+
+                <input asp-for="Text" class="form-control" placeholder="Wpisz pytanie..." />
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleFileInput(this)">
+                    <i class="fa-regular fa-image"></i> Dodaj obraz
+                </button>
+            </div>
+            <div class="mb-3 file-upload d-none">
+                <input asp-for="UploadedFile" class="form-control" type="file" accept=".jpg,.png,.bmp,.jpeg" placeholder="Wybierz obraz..." onchange="previewImage(this)"/>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.PathToFile))
+            {        
+                <div class="image-block">
+
+                    <img src="@Model.PathToFile" class="img-thumbnail"  width="400"/>
+                    <button id="@Model.Id" class="btn btn-outline-danger" type="button" onclick="deleteImage(this)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            }
+
+
+        </div>
+        <!-- Question Answers -->
+        <div class="answers-container">
+            @for (int j = 0; j < Model.Answers.Count; j++)
+            {
+                var answerPrefix = $"{prefix}.Answers[{j}]";
+                <div class="answer-block border rounded p-3 mb-2">
+                    <div class="mb-2">
+                        @if (Model.Answers[j].Id != 0)
+                        {
+                            <input asp-for="@Model.Answers[j].Id" type="hidden" />
+                        }
+                        <label class="form-label fw-bold">Odpowiedź:</label>
+                        <input asp-for="@Model.Answers[j].Text" class="form-control"/>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="@Model.Answers[j].IsCorrect" type="checkbox" />
+
+                        <input type="hidden" name="@($"{prefix}.Answers[{j}].IsCorrect")" value="false" />
+                        <label class="form-check-label">Poprawna</label>
+                    </div>
+                    <button id="@Model.Answers[j].Id"  type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
+                </div>
+            }
+        </div>
+    
+        <button type="button" class="btn btn-outline-primary add-answer mt-2" onclick="addAnswer(this)">Dodaj odpowiedź</button>
+
+        <button id="@Model.Id" type="button" class="btn btn-outline-danger mt-2" onclick="deleteQuestion(this)">
+            Usuń pytanie
+        </button>
+    
+    </div>
+</div>

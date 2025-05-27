@@ -11,11 +11,11 @@ namespace Models.Models
     public class Answer
     {
         public int Id { get; set; }
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public bool IsCorrect { get; set; }=false;
         public int QuestionId { get; set; }
         [ForeignKey("QuestionId")]
         [ValidateNever]
-        public Question Question { get; set; }
+        public Question? Question { get; set; }
     }
 }

@@ -14,7 +14,9 @@ namespace DataAccess.IRepo
         //public IBaseRepository<UserQuiz> UserQuizzes { get; }
         //public IBaseRepository<Answer> Answers { get; }
         public IQuestionRepository Questions { get; }
-        public IBaseRepository<Quiz> Quizzes { get; }
+        public IQuizRepository Quizzes { get; }
+        public IBaseRepository<Answer> Answers { get; }
+        public IBaseRepository<TestResult> TestResults { get; }
         public Task CommitAsync();
     }
 }
