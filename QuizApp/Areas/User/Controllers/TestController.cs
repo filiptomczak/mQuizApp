@@ -72,7 +72,7 @@ namespace QuizApp.Areas.User.Controllers
             //zapis username, quiz name/id i result do db
 
         }
-        private async void SaveResultAsync(int points, string userName, int quizId)
+        private async Task SaveResultAsync(int points, string userName, int quizId)
         {
             var testResult = new TestResult()
             {

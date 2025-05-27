@@ -9,10 +9,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repo
 {
-    public class TestResultRepository : BaseRepository<TestResult>, ITestResultRepository
+    public class QuizRepository : BaseRepository<Quiz>, IQuizRepository
     {
-        public TestResultRepository(AppDbContext context) : base(context)
+        public QuizRepository(AppDbContext context) : base(context)
         {
+        }
+
+        public Quiz GetQuizWithQuestionsAndAnswers(int id)
+        {
+            return _context.Quizzes
+                .Include(q => q.Questions)
+                    .ThenInclude(q => q.Answers)
+                .FirstOrDefault(q => q.Id == id);
         }
     }
 }

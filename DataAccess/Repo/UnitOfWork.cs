@@ -17,7 +17,7 @@ namespace DataAccess.Repo
             IQuestionRepository questions,
             IQuizRepository quizzes,
             IBaseRepository<Answer> answers,
-            ITestResultRepository testResults
+            IBaseRepository<TestResult> testResults
             //IBaseRepository<User> users, 
             //IBaseRepository<UserAnswer> userAnswers, 
             //IBaseRepository<UserQuiz> userQuizzes
@@ -40,7 +40,7 @@ namespace DataAccess.Repo
         public IQuestionRepository Questions { get; }
         public IQuizRepository Quizzes { get; }
 
-        public ITestResultRepository TestResults { get; }
+        public IBaseRepository<TestResult> TestResults { get; }
 
         public async Task CommitAsync()
         {

@@ -9,6 +9,7 @@ namespace DataAccess
         //public DbSet<Answer>Answers { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Quiz>Quizzes { get; set; }
+        public DbSet<TestResult> Results { get; set; }
         //public DbSet<User>Users { get; set; }
         //public DbSet<UserAnswer>UserAnswers{ get; set; }
         //public DbSet<UserQuiz>UserQuizzes{ get; set; }
