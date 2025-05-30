@@ -36,6 +36,7 @@ namespace QuizApp.Areas.User.Controllers
                 {
                     QuestionId = q.Id,
                     Text = q.Text,
+                    ImgPath = q.PathToFile,
                     Answers = q.Answers.Select(a => a.Text).ToList()
                 }).ToList()
             };
