@@ -41,3 +41,9 @@ body {
     background-color: #fdfdfd;
     border-radius: 10px;
 }
+
+.radio-group{
+    font-size:1.1rem;
+    padding-top:5px;
+    padding-bottom:5px;
+}
