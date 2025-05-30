@@ -21,7 +21,12 @@
 
         <div class="mb-4 p-3 border rounded shadow-sm bg-light">
             <p class="fw-bold">Pytanie @(@i + 1): @question.Text</p>
-
+            
+            @if(!string.IsNullOrEmpty(question.ImgPath)){
+                <img src="@question.ImgPath" style="width: 100%; height: auto;" />
+            }
+            
+            
             @{
                 var abc = new List<char>();
                 for (int c = 97; c < 97 + question.Answers.Count; c++)
@@ -33,13 +38,14 @@
             {
                 var answer = question.Answers[j];
 
-                <div class="form-check">
+                <div class="form-check radio-group">
                     <input type="radio"
                            class="form-check-input"
                            name="Answers[@i].SelectedAnswer"
                            value="@answer"
+                           id="radio-question[@question.QuestionId]-answer[@j]"
                            required />
-                    <label class="form-check-label">@abc[j]. @answer</label>
+                    <label class="form-check-label" for="radio-question[@question.QuestionId]-answer[@j]" style="width: 100%" >@abc[j]. @answer</label>
                 </div>
             }
 
