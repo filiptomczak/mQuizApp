@@ -5,12 +5,13 @@
 }
 
 <h2 class="mb-4">@Model.Title</h2>
-<form asp-action="Submit" method="post">
+<form asp-action="TakeTest" method="post" novalidate>
     <input type="hidden" name="QuizId" value="@Model.QuizId" />
 
     <div class="mb-4">
         <label for="UserName" class="form-label">Twoje imię i nazwisko:</label>
-        <input type="text" class="form-control" name="UserName" required />
+        <input type="text" class="form-control" name="UserName" id="username" required minlength="6"/>
+        <span class="error" aria-live="polite" id="username-error"></span>
     </div>
 
     @for (int i = 0; i < Model.Questions.Count; i++)
@@ -55,5 +56,43 @@
 
     
 
-    <button type="submit" class="btn btn-success">Zakończ i sprawdź wynik</button>
+    <button type="submit" class="btn btn-success" id="btn-submit">Zakończ i sprawdź wynik</button>
 </form>
+
+@section Scripts {
+    <script>
+        const form = document.querySelector("form");
+        const username = document.getElementById('username');
+        const error = document.getElementById('username-error');
+
+        username.addEventListener("input", () => {
+            if (username.validity.valid) {
+                error.textContent = "";
+                error.className = "error";
+            } else {
+                showError();
+            }
+        });
+
+        form.addEventListener("submit", (event) => {
+            if (!username.validity.valid) {
+                showError();
+                event.preventDefault();
+            }
+            username.focus();
+            username.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+
+        function showError() {
+            if (username.validity.valueMissing) {
+                error.textContent = "Wpisz imię i nazwisko";
+            } else if (username.value.length < 6) {
+                error.textContent = "Imię i nazwisko musi mieć co najmniej 6 znaków";
+            } else {
+                error.textContent = "Wpisz imię i nazwisko";
+            }
+
+            error.className = "error active";
+        }
+    </script>
+}

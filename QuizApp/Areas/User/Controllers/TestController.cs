@@ -45,10 +45,10 @@ namespace QuizApp.Areas.User.Controllers
         }
 
         [HttpPost]
-        public IActionResult Submit(TestSubmissionVM model)
+        public IActionResult TakeTest(TestSubmissionVM model)
         {
             if (!ModelState.IsValid) {
-                return View(model);
+                RedirectToAction("TakeTest", model.QuizId);
             }
 
             var points = CheckAnswers(model.Answers);

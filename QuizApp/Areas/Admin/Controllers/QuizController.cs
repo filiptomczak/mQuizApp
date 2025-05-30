@@ -1,4 +1,5 @@
 ﻿using DataAccess.IRepo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Models;
@@ -8,6 +9,7 @@ using System.IO;
 namespace QuizApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class QuizController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
