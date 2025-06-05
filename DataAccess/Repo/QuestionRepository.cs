@@ -19,7 +19,6 @@ namespace DataAccess.Repo
         public void UpdateRange(IEnumerable<Question> questions)
         {
             _context.Questions.UpdateRange(questions);
-            _context.SaveChanges();
         }
     }
 }

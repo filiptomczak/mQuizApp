@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Models.Models;
 using QuizApp.Seed;
+using Services.IServices;
+using Services.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,12 +33,12 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-//builder.Services.AddScoped<IBaseRepository<Answer>, BaseRepository<Answer>>();
-//builder.Services.AddScoped<IBaseRepository<Quiz>, BaseRepository<Quiz>>();
-//builder.Services.AddScoped<IBaseRepository<Question>, BaseRepository<Question>>();
-//builder.Services.AddScoped<IBaseRepository<User>, BaseRepository<User>>();
-//builder.Services.AddScoped<IBaseRepository<UserAnswer>, BaseRepository<UserAnswer>>();
-//builder.Services.AddScoped<IBaseRepository<UserQuiz>, BaseRepository<UserQuiz>>();
+
+builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IResultService, ResultService>();
 
 var app = builder.Build();
 

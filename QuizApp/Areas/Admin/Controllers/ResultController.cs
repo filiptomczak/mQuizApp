@@ -1,6 +1,8 @@
 ﻿using DataAccess.IRepo;
 using Microsoft.AspNetCore.Mvc;
 using Models.ViewModels;
+using Services.IServices;
+using Services.Service;
 
 namespace QuizApp.Areas.Admin.Controllers
 {
@@ -8,43 +10,25 @@ namespace QuizApp.Areas.Admin.Controllers
     public class ResultController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ResultController(IUnitOfWork unitOfWork)
+        private readonly IResultService _resultService;
+
+        public ResultController(IResultService resultService,IUnitOfWork unitOfWork)
         {
+            _resultService = resultService;
             _unitOfWork = unitOfWork;
         }
         public async Task<IActionResult> Index()
         {
-            var quizzes = _unitOfWork.Quizzes.GetAllAsync();
+            var top3results = _resultService.GetAllQuizzesWithNResults(3);
 
-            var leadboarders = quizzes.Result.Select(q => new QuizLeaderboardVM
-            {
-                QuizId = q.Id,
-                Title = q.Title,
-                Results = _unitOfWork.TestResults.GetAllAsync().Result
-                    .Where(t => t.QuizId == q.Id)
-                    .OrderByDescending(t => t.Points)
-                    .Take(3)
-                    .ToList(),
-            }).ToList();
-
-            return View(leadboarders);
+            return View(top3results.Result);
         }
 
-        public async Task<IActionResult> Details()
+        public async Task<IActionResult> Details(int id)
         {
-            var quizzes = _unitOfWork.Quizzes.GetAllAsync();
+            var allResults = _resultService.GetQuizzWithAllResults(id);
 
-            var results = quizzes.Result.Select(q => new QuizLeaderboardVM
-            {
-                QuizId = q.Id,
-                Title = q.Title,
-                Results = _unitOfWork.TestResults.GetAllAsync().Result
-                    .Where(t => t.QuizId == q.Id)
-                    .OrderByDescending(t => t.Points)
-                    .ToList(),
-            }).ToList();
-
-            return View(results);
+            return View(allResults.Result);
         }
     }
 }

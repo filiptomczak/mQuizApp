@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Models.Models;
 using Models.ViewModels;
+using Services.IServices;
 
 namespace QuizApp.Areas.User.Controllers
 {
@@ -9,6 +10,7 @@ namespace QuizApp.Areas.User.Controllers
     public class TestController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+
         public TestController(IUnitOfWork unitOfWork)
         {
                 _unitOfWork = unitOfWork;
@@ -82,6 +84,7 @@ namespace QuizApp.Areas.User.Controllers
                 Points = points
             };
             await _unitOfWork.TestResults.AddAsync(testResult);
+            await _unitOfWork.CommitAsync();
         }
     }
 }
