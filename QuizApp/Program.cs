@@ -39,6 +39,7 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IResultService, ResultService>();
+builder.Services.AddScoped<ITestService, TestService>();
 
 var app = builder.Build();
 
