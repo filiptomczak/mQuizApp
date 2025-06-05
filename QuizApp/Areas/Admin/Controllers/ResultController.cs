@@ -15,6 +15,7 @@ namespace QuizApp.Areas.Admin.Controllers
         {
             _resultService = resultService;
         }
+
         public async Task<IActionResult> Index()
         {
             var top3results = _resultService.GetAllQuizzesWithNResults(3);

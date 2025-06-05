@@ -13,11 +13,13 @@ namespace Services.Service
     {
         private readonly IBaseRepository<T> _repository;
         private readonly IUnitOfWork _unitOfWork;
+
         public BaseService(IBaseRepository<T> repository, IUnitOfWork unitOfWork)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
         }
+
         public async Task AddAsync(T entity)
         {
             await _repository.AddAsync(entity);

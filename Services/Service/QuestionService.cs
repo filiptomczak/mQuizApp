@@ -13,6 +13,7 @@ namespace Services.Service
     {
         private readonly IQuestionRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
+
         public QuestionService(IQuestionRepository repository, IUnitOfWork unitOfWork) : base(repository,unitOfWork)
         {
             _repository = repository;

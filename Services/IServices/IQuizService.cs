@@ -18,8 +18,5 @@ namespace Services.IServices
         public Task DeleteQuestion(int id);
         public Task DeleteAnswer(int id);
         public Task DeleteImage(int id);
-
-
-
     }
 }
