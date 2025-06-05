@@ -10,40 +10,28 @@ namespace QuizApp.Areas.User.Controllers
     public class TestController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public TestController(IUnitOfWork unitOfWork)
+        private readonly IQuizService _quizService;
+        private readonly ITestService _testService;
+        public TestController(IQuizService quizService, ITestService testService, IUnitOfWork unitOfWork)
         {
-                _unitOfWork = unitOfWork;
+            _quizService = quizService;
+            _unitOfWork = unitOfWork;
+            _testService = testService;
         }
         public async Task<IActionResult> Index()
         {
-            var tests = await _unitOfWork.Quizzes.GetAllAsync();
+            var tests = await _quizService.GetAllAsync();
             return View(tests);
         }
         [HttpGet]
         public IActionResult TakeTest(int id)
         {
-            var quiz = _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswers(id);
-            if(quiz == null)
+            var takeTestVM = _testService.CreateTest(id);
+            if (takeTestVM == null)
             {
-                RedirectToAction("Index");
+                RedirectToAction(nameof(Index));
             }
-
-            var takeTestVM = new TakeTestVM
-            {
-                QuizId = quiz.Id,
-                Title = quiz.Title,
-                Description = quiz.Description,
-                Questions = quiz.Questions.Select(q => new TakeQuestionVM
-                {
-                    QuestionId = q.Id,
-                    Text = q.Text,
-                    ImgPath = q.PathToFile,
-                    Answers = q.Answers.Select(a => a.Text).ToList()
-                }).ToList()
-            };
-
-            return View(takeTestVM);
+            return View(takeTestVM.Result);
         }
 
         [HttpPost]
@@ -53,28 +41,11 @@ namespace QuizApp.Areas.User.Controllers
                 RedirectToAction("TakeTest", model.QuizId);
             }
 
-            var points = CheckAnswers(model.Answers);
-            SaveResultAsync(points,model.UserName,model.QuizId);
+            _testService.SaveResult(model);
             return RedirectToAction(nameof(Index));
         }
 
-        private int CheckAnswers(List<SubmittedAnswerVM>answers)
-        {
-            var result = 0;
-            foreach (var answer in answers) {
-                var questionId = answer.QuestionId;
-                var correctAnswerText = _unitOfWork.Questions
-                        .Get(q => q.Id == questionId, includeProperties:"Answers")?
-                        .Answers.SingleOrDefault(a => a.IsCorrect)?
-                        .Text;
-
-                if (correctAnswerText == answer.SelectedAnswer)
-                    result++;
-            }
-            return result;
-            //zapis username, quiz name/id i result do db
-
-        }
+        
         private async Task SaveResultAsync(int points, string userName, int quizId)
         {
             var testResult = new TestResult()
