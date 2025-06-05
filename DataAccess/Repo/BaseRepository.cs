@@ -24,18 +24,16 @@ namespace DataAccess.Repo
         public async Task AddAsync(T entity)
         {
             await _set.AddAsync(entity);
-            await _context.SaveChangesAsync();
         }
 
         public void Delete(T entity)
         {
             _set.Remove(entity);
-            _context.SaveChanges();
         }
 
         public async Task<T> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _set.FindAsync(predicate);
+            return await _set.FirstOrDefaultAsync(predicate);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -65,7 +63,6 @@ namespace DataAccess.Repo
         public void Update(T entity)
         {
             _set.Update(entity);
-            _context.SaveChanges();
         }
     }
 }

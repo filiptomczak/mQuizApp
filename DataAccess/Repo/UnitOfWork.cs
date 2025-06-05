@@ -18,9 +18,6 @@ namespace DataAccess.Repo
             IQuizRepository quizzes,
             IBaseRepository<Answer> answers,
             IBaseRepository<TestResult> testResults
-            //IBaseRepository<User> users, 
-            //IBaseRepository<UserAnswer> userAnswers, 
-            //IBaseRepository<UserQuiz> userQuizzes
             )
         {
             _context = context;
@@ -28,18 +25,11 @@ namespace DataAccess.Repo
             Questions = questions;
             Quizzes = quizzes;
             TestResults = testResults;
-            //Users = users;
-            //UserAnswers = userAnswers;
-            //UserQuizzes = userQuizzes;
         }
 
-        //public IBaseRepository<User> Users { get; }
-        //public IBaseRepository<UserAnswer> UserAnswers { get; }
-        //public IBaseRepository<UserQuiz> UserQuizzes { get; }
         public IBaseRepository<Answer> Answers { get; }
         public IQuestionRepository Questions { get; }
         public IQuizRepository Quizzes { get; }
-
         public IBaseRepository<TestResult> TestResults { get; }
 
         public async Task CommitAsync()

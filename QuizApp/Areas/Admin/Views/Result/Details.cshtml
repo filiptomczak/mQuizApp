@@ -1,21 +1,18 @@
-﻿@model List<QuizLeaderboardVM>
+﻿@model QuizLeaderboardVM
 
 <h2 class="mb-4">Wynik quizu</h2>
 
-@foreach (var quiz in Model)
-{
-    <div class="card mb-3 shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">@quiz.Title</h5>
-            <ol class="mb-3">
-                @foreach (var result in quiz.Results)
-                {
-                    <li>@result.UserName – <strong>@result.Points pkt</strong></li>
-                }
-            </ol>
-            <a asp-action="Details" asp-route-id="@quiz.QuizId" class="btn btn-outline-primary btn-sm">
-                Wyświetl wszystkie wyniki
-            </a>
-        </div>
+<a asp-action="Index" class="btn btn-outline-primary btn-sm">
+    Powrót
+</a>
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <ol class="mb-3">
+        @foreach (var result in Model.Results)
+        {
+            <li>@result.UserName – <strong>@result.Points pkt</strong></li>          
+        }
+        </ol>
+
     </div>
-}
+</div>
