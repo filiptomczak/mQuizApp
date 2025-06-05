@@ -9,13 +9,11 @@ namespace QuizApp.Areas.Admin.Controllers
     [Area("Admin")]
     public class ResultController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IResultService _resultService;
 
-        public ResultController(IResultService resultService,IUnitOfWork unitOfWork)
+        public ResultController(IResultService resultService)
         {
             _resultService = resultService;
-            _unitOfWork = unitOfWork;
         }
         public async Task<IActionResult> Index()
         {

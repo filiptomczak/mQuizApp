@@ -14,7 +14,7 @@ namespace QuizApp.Areas.Admin.Controllers
     public class QuizController : Controller
     {
         private readonly IQuizService _quizService;
-        public QuizController(IQuizService quizService, IWebHostEnvironment webHostEnvironment)
+        public QuizController(IQuizService quizService)
         {
             _quizService = quizService;
         }
