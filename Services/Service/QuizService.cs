@@ -32,9 +32,7 @@ namespace Services.Service
 
         public Quiz GetQuizWithQuestionsAndAnswers(int id)
         {
-
             return _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswers(id);
-
         }
 
         public async Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync()
@@ -67,7 +65,7 @@ namespace Services.Service
 
         public async Task UpdateQuizAsync(QuizVM quizVM)
         {
-            var quizFromDb = _quizRepository.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
+            var quizFromDb = _unitOfWork.Quizzes.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
 
             if (quizFromDb == null)
                 throw new Exception("Quiz not found");
@@ -134,7 +132,7 @@ namespace Services.Service
             {
                 AddQuestionsToQuizFromQuizVM(quizVM);
                 
-                _quizRepository.Update(quizVM.Quiz);
+                _unitOfWork.Quizzes.Update(quizVM.Quiz);
                 await _unitOfWork.CommitAsync();
             }
         }

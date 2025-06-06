@@ -12,14 +12,8 @@ namespace Services.Service
     public class BaseService<T> : IBaseService<T> where T : class
     {
         private readonly IBaseRepository<T> _repository;
-<<<<<<< Updated upstream
-        private readonly IUnitOfWork _unitOfWork;
-
-        public BaseService(IBaseRepository<T> repository, IUnitOfWork unitOfWork)
-=======
 
         public BaseService(IBaseRepository<T> repository)
->>>>>>> Stashed changes
         {
             _repository = repository;
         }
