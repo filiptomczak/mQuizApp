@@ -12,23 +12,24 @@ namespace Services.Service
     public class BaseService<T> : IBaseService<T> where T : class
     {
         private readonly IBaseRepository<T> _repository;
+<<<<<<< Updated upstream
         private readonly IUnitOfWork _unitOfWork;
         public BaseService(IBaseRepository<T> repository, IUnitOfWork unitOfWork)
+=======
+
+        public BaseService(IBaseRepository<T> repository)
+>>>>>>> Stashed changes
         {
             _repository = repository;
-            _unitOfWork = unitOfWork;
         }
         public async Task AddAsync(T entity)
         {
             await _repository.AddAsync(entity);
-            await _unitOfWork.CommitAsync();
         }
 
         public void Delete(T entity)
         {
             _repository.Delete(entity);
-            _unitOfWork.CommitAsync().Wait();
-
         }
 
         public async Task<T> FindAsync(Expression<Func<T, bool>> predicate)
@@ -54,7 +55,6 @@ namespace Services.Service
         public void Update(T entity)
         {
             _repository.Update(entity);
-            _unitOfWork.CommitAsync().Wait();
         }
     }
 }

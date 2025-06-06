@@ -1,4 +1,5 @@
-﻿using Models.Models;
+﻿using DataAccess.IRepo;
+using Models.Models;
 using Models.ViewModels;
 using Services.IServices;
 using System;
@@ -11,13 +12,17 @@ namespace Services.Service
 {
     public class TestService : ITestService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IQuizService _quizService;
         private readonly IBaseService<TestResult> _testResultService;
         private readonly IQuestionService _questionService;
-        public TestService(IQuizService quizService,
+        public TestService(
+            IUnitOfWork unitOfWork,
+            IQuizService quizService,
             IBaseService<TestResult> testResultService,
             IQuestionService questionService)
         {
+            _unitOfWork = unitOfWork;
             _quizService = quizService;
             _testResultService = testResultService;
             _questionService = questionService;
@@ -58,6 +63,7 @@ namespace Services.Service
             };
 
             _testResultService.AddAsync(testResult);
+            _unitOfWork.CommitAsync();
         }
 
         private int CheckAnswers(List<SubmittedAnswerVM> answers)

@@ -13,22 +13,38 @@ namespace Services.Service
 {
     public class QuizService : BaseService<Quiz>, IQuizService
     {
+<<<<<<< Updated upstream
         private readonly IQuizRepository _repository;
+=======
+>>>>>>> Stashed changes
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
 
+<<<<<<< Updated upstream
         public QuizService(IQuizRepository repository, 
             IUnitOfWork unitOfWork,
             IFileService fileService) : base(repository, unitOfWork)
         {
             _repository = repository;
+=======
+        public QuizService(
+            IUnitOfWork unitOfWork,
+            IFileService fileService,
+            IQuestionService questionService,
+            IBaseService<Answer> answerService) : base(unitOfWork.Quizzes)
+        {
+>>>>>>> Stashed changes
             _unitOfWork = unitOfWork;
             _fileService = fileService;
         }
 
         public Quiz GetQuizWithQuestionsAndAnswers(int id)
         {
+<<<<<<< Updated upstream
             return _repository.GetQuizWithQuestionsAndAnswers(id);
+=======
+            return _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswers(id);
+>>>>>>> Stashed changes
         }
 
         public async Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync()
@@ -45,8 +61,13 @@ namespace Services.Service
         public async Task<Quiz> GetByIdWithQuestionsAsync(int id)
         {
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
+<<<<<<< Updated upstream
             var questions = await _unitOfWork.Questions.GetAllAsync();
             var answers = await _unitOfWork.Answers.GetAllAsync();
+=======
+            var questions = await _questionService.GetAllAsync();
+            var answers = await _answerService.GetAllAsync();
+>>>>>>> Stashed changes
 
             quiz.Questions = questions
                 .Where(q => q.QuizId == quiz.Id)
