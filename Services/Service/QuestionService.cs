@@ -12,12 +12,8 @@ namespace Services.Service
     public class QuestionService : BaseService<Question>, IQuestionService
     {
         private readonly IUnitOfWork _unitOfWork;
-<<<<<<< Updated upstream
-        public QuestionService(IQuestionRepository repository, IUnitOfWork unitOfWork) : base(repository,unitOfWork)
-=======
 
         public QuestionService(IUnitOfWork unitOfWork) : base(unitOfWork.Questions)
->>>>>>> Stashed changes
         {
             _unitOfWork=unitOfWork;
         }

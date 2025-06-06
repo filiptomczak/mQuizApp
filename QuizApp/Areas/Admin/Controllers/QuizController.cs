@@ -14,15 +14,18 @@ namespace QuizApp.Areas.Admin.Controllers
     public class QuizController : Controller
     {
         private readonly IQuizService _quizService;
+
         public QuizController(IQuizService quizService)
         {
             _quizService = quizService;
         }
+
         public async Task<IActionResult> Index()
         {
             var quizes = await _quizService.GetAllWithQuestionsAsync();
             return View(quizes);
         }
+
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
@@ -48,7 +51,6 @@ namespace QuizApp.Areas.Admin.Controllers
             };
             return View(quizVM);
         }
-
         
         [HttpPost]
         public async Task<IActionResult> Update(QuizVM quizVM)
@@ -119,6 +121,7 @@ namespace QuizApp.Areas.Admin.Controllers
                 message = "Answer Succesfully Deleted",
             });
         }
+
         [HttpDelete]
         public async Task<IActionResult> DeleteImage(int id)
         {

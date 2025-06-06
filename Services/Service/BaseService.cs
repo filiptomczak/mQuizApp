@@ -14,6 +14,7 @@ namespace Services.Service
         private readonly IBaseRepository<T> _repository;
 <<<<<<< Updated upstream
         private readonly IUnitOfWork _unitOfWork;
+
         public BaseService(IBaseRepository<T> repository, IUnitOfWork unitOfWork)
 =======
 
@@ -22,6 +23,7 @@ namespace Services.Service
         {
             _repository = repository;
         }
+
         public async Task AddAsync(T entity)
         {
             await _repository.AddAsync(entity);

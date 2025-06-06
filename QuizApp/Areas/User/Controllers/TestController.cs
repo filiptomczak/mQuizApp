@@ -9,20 +9,21 @@ namespace QuizApp.Areas.User.Controllers
     [Area("User")]
     public class TestController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IQuizService _quizService;
         private readonly ITestService _testService;
-        public TestController(IQuizService quizService, ITestService testService, IUnitOfWork unitOfWork)
+
+        public TestController(IQuizService quizService, ITestService testService)
         {
             _quizService = quizService;
-            _unitOfWork = unitOfWork;
             _testService = testService;
         }
+
         public async Task<IActionResult> Index()
         {
             var tests = await _quizService.GetAllAsync();
             return View(tests);
         }
+
         [HttpGet]
         public IActionResult TakeTest(int id)
         {
@@ -43,19 +44,6 @@ namespace QuizApp.Areas.User.Controllers
 
             _testService.SaveResult(model);
             return RedirectToAction(nameof(Index));
-        }
-
-        
-        private async Task SaveResultAsync(int points, string userName, int quizId)
-        {
-            var testResult = new TestResult()
-            {
-                UserName = userName,
-                QuizId = quizId,
-                Points = points
-            };
-            await _unitOfWork.TestResults.AddAsync(testResult);
-            await _unitOfWork.CommitAsync();
         }
     }
 }

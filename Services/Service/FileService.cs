@@ -12,10 +12,12 @@ namespace Services.Service
     public class FileService : IFileService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
+
         public FileService(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
         }
+
         public void DeleteOld(string filePath)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;

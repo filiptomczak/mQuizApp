@@ -13,44 +13,34 @@ namespace Services.Service
 {
     public class QuizService : BaseService<Quiz>, IQuizService
     {
-<<<<<<< Updated upstream
-        private readonly IQuizRepository _repository;
-=======
->>>>>>> Stashed changes
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
+        private readonly IQuestionService _questionService;
+        private readonly IBaseService<Answer> _answerService;
 
-<<<<<<< Updated upstream
-        public QuizService(IQuizRepository repository, 
-            IUnitOfWork unitOfWork,
-            IFileService fileService) : base(repository, unitOfWork)
-        {
-            _repository = repository;
-=======
         public QuizService(
             IUnitOfWork unitOfWork,
             IFileService fileService,
             IQuestionService questionService,
             IBaseService<Answer> answerService) : base(unitOfWork.Quizzes)
         {
->>>>>>> Stashed changes
             _unitOfWork = unitOfWork;
             _fileService = fileService;
+            _questionService = questionService;
+            _answerService = answerService;
         }
 
         public Quiz GetQuizWithQuestionsAndAnswers(int id)
         {
-<<<<<<< Updated upstream
-            return _repository.GetQuizWithQuestionsAndAnswers(id);
-=======
+
             return _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswers(id);
->>>>>>> Stashed changes
+
         }
 
         public async Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync()
         {
             var quizes = await _unitOfWork.Quizzes.GetAllAsync();
-            var questions = await _unitOfWork.Questions.GetAllAsync();
+            var questions = await _questionService.GetAllAsync();
             foreach (var quiz in quizes)
             {
                 quiz.Questions = questions.Where(q => q.QuizId == quiz.Id).ToList();
@@ -61,14 +51,9 @@ namespace Services.Service
         public async Task<Quiz> GetByIdWithQuestionsAsync(int id)
         {
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
-<<<<<<< Updated upstream
-            var questions = await _unitOfWork.Questions.GetAllAsync();
-            var answers = await _unitOfWork.Answers.GetAllAsync();
-=======
             var questions = await _questionService.GetAllAsync();
             var answers = await _answerService.GetAllAsync();
->>>>>>> Stashed changes
-
+            
             quiz.Questions = questions
                 .Where(q => q.QuizId == quiz.Id)
                 .Select(q =>
@@ -82,7 +67,7 @@ namespace Services.Service
 
         public async Task UpdateQuizAsync(QuizVM quizVM)
         {
-            var quizFromDb = _unitOfWork.Quizzes.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
+            var quizFromDb = _quizRepository.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
 
             if (quizFromDb == null)
                 throw new Exception("Quiz not found");
@@ -149,7 +134,7 @@ namespace Services.Service
             {
                 AddQuestionsToQuizFromQuizVM(quizVM);
                 
-                _unitOfWork.Quizzes.Update(quizVM.Quiz);
+                _quizRepository.Update(quizVM.Quiz);
                 await _unitOfWork.CommitAsync();
             }
         }
@@ -177,20 +162,20 @@ namespace Services.Service
 
         public async Task DeleteQuestion(int id)
         {
-            var entity = await _unitOfWork.Questions.GetByIdAsync(id);
-            _unitOfWork.Questions.Delete(entity);
+            var entity = await _questionService.GetByIdAsync(id);
+            _questionService.Delete(entity);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task DeleteAnswer(int id)
         {
-            var entity = await _unitOfWork.Answers.GetByIdAsync(id);
-            _unitOfWork.Answers.Delete(entity);
+            var entity = await _answerService.GetByIdAsync(id);
+            _answerService.Delete(entity);
             await _unitOfWork.CommitAsync();
         }
         public async Task DeleteImage(int id)
         {
-            var entity = await _unitOfWork.Questions.GetByIdAsync(id);
+            var entity = await _questionService.GetByIdAsync(id);
             if (!string.IsNullOrEmpty(entity.PathToFile))
             {
                 _fileService.DeleteOld(entity.PathToFile);
