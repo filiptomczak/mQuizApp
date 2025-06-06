@@ -11,19 +11,16 @@ namespace Services.Service
 {
     public class QuestionService : BaseService<Question>, IQuestionService
     {
-        private readonly IQuestionRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public QuestionService(IQuestionRepository repository, IUnitOfWork unitOfWork) : base(repository,unitOfWork)
+        public QuestionService(IUnitOfWork unitOfWork) : base(unitOfWork.Questions)
         {
-            _repository = repository;
-            _unitOfWork = unitOfWork;
+            _unitOfWork=unitOfWork;
         }
 
         public void UpdateRange(IEnumerable<Question> questions)
         {
-            _repository.UpdateRange(questions);
-            _unitOfWork.CommitAsync().Wait();
+            _unitOfWork.Questions.UpdateRange(questions);
         }
     }
 }

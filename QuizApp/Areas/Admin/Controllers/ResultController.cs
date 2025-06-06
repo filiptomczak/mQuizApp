@@ -1,4 +1,5 @@
 ﻿using DataAccess.IRepo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.ViewModels;
 using Services.IServices;
@@ -7,6 +8,7 @@ using Services.Service;
 namespace QuizApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class ResultController : Controller
     {
         private readonly IResultService _resultService;

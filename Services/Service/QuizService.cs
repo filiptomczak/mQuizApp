@@ -13,19 +13,17 @@ namespace Services.Service
 {
     public class QuizService : BaseService<Quiz>, IQuizService
     {
-        private readonly IQuizRepository _quizRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
         private readonly IQuestionService _questionService;
         private readonly IBaseService<Answer> _answerService;
 
-        public QuizService(IQuizRepository quizRepository, 
+        public QuizService(
             IUnitOfWork unitOfWork,
             IFileService fileService,
             IQuestionService questionService,
-            IBaseService<Answer> answerService) : base(quizRepository, unitOfWork)
+            IBaseService<Answer> answerService) : base(unitOfWork.Quizzes)
         {
-            _quizRepository = quizRepository;
             _unitOfWork = unitOfWork;
             _fileService = fileService;
             _questionService = questionService;
@@ -34,7 +32,9 @@ namespace Services.Service
 
         public Quiz GetQuizWithQuestionsAndAnswers(int id)
         {
-            return _quizRepository.GetQuizWithQuestionsAndAnswers(id);
+
+            return _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswers(id);
+
         }
 
         public async Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync()
@@ -50,10 +50,10 @@ namespace Services.Service
 
         public async Task<Quiz> GetByIdWithQuestionsAsync(int id)
         {
-            var quiz = await _quizRepository.GetByIdAsync(id);
+            var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
             var questions = await _questionService.GetAllAsync();
             var answers = await _answerService.GetAllAsync();
-
+            
             quiz.Questions = questions
                 .Where(q => q.QuizId == quiz.Id)
                 .Select(q =>
