@@ -10,6 +10,6 @@ namespace Services.IServices
     public interface ITestService
     {
         public Task<TakeTestVM> CreateTest(int quizId);
-        public void SaveResult(TestSubmissionVM model);
+        public Task SaveResult(TestSubmissionVM model);
     }
 }

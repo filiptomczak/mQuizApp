@@ -30,7 +30,7 @@ namespace QuizApp.Areas.User.Controllers
             var takeTestVM = _testService.CreateTest(id);
             if (takeTestVM == null)
             {
-                RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
             return View(takeTestVM.Result);
         }
@@ -39,7 +39,7 @@ namespace QuizApp.Areas.User.Controllers
         public IActionResult TakeTest(TestSubmissionVM model)
         {
             if (!ModelState.IsValid) {
-                RedirectToAction("TakeTest", model.QuizId);
+                return RedirectToAction("TakeTest", model.QuizId);
             }
 
             _testService.SaveResult(model);

@@ -1,4 +1,5 @@
 ﻿using Models.Models;
+using Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace DataAccess.IRepo
 {
     public interface IQuizRepository : IBaseRepository<Quiz>
     {
-        public Quiz GetQuizWithQuestionsAndAnswers(int id);
+        public Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id);
     }
 }

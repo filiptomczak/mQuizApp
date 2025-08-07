@@ -27,31 +27,17 @@ namespace Services.Service
             _testResultService = testResultService;
             _questionService = questionService;
         }
-        public Task<TakeTestVM> CreateTest(int quizId)
+        public async Task<TakeTestVM> CreateTest(int quizId)
         {
-            var quiz = _quizService.GetQuizWithQuestionsAndAnswers(quizId);
-            if (quiz == null)
+            var takeTestVM = await _quizService.GetTestVMWithQuestionsAndAnswersAsync(quizId);
+            if (takeTestVM == null)
             {
                 return null;
             }
-
-            var takeTestVM = new TakeTestVM
-            {
-                QuizId = quiz.Id,
-                Title = quiz.Title,
-                Description = quiz.Description,
-                Questions = quiz.Questions.Select(q => new TakeQuestionVM
-                {
-                    QuestionId = q.Id,
-                    Text = q.Text,
-                    ImgPath = q.PathToFile,
-                    Answers = q.Answers.Select(a => a.Text).ToList()
-                }).ToList()
-            };
-            return Task.FromResult(takeTestVM);
+            return takeTestVM;
         }
 
-        public void SaveResult(TestSubmissionVM model)
+        public async Task SaveResult(TestSubmissionVM model)
         {
             var points = CheckAnswers(model.Answers);
 
@@ -62,8 +48,8 @@ namespace Services.Service
                 Points = points
             };
 
-            _testResultService.AddAsync(testResult);
-            _unitOfWork.CommitAsync();
+            await _testResultService.AddAsync(testResult);
+            await _unitOfWork.CommitAsync();
         }
 
         private int CheckAnswers(List<SubmittedAnswerVM> answers)

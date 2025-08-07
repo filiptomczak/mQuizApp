@@ -30,9 +30,9 @@ namespace Services.Service
             _answerService = answerService;
         }
 
-        public Quiz GetQuizWithQuestionsAndAnswers(int id)
+        public Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id)
         {
-            return _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswers(id);
+            return _unitOfWork.Quizzes.GetTestVMWithQuestionsAndAnswersAsync(id);
         }
 
         public async Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync()

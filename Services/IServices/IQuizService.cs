@@ -10,7 +10,7 @@ namespace Services.IServices
 {
     public interface IQuizService:IBaseService<Quiz>
     {
-        public Quiz GetQuizWithQuestionsAndAnswers(int id);
+        public Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id);
         public Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync();
         public Task<Quiz> GetByIdWithQuestionsAsync(int id);
         public Task UpdateQuizAsync(QuizVM quizVM);
