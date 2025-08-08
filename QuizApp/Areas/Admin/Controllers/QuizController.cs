@@ -89,15 +89,15 @@ namespace QuizApp.Areas.Admin.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var quiz = await _quizService.GetByIdAsync(id);
-            if (quiz == null)
-                return NotFound();
-            _quizService.Delete(quiz);
-            return Json(new
+            if (await _quizService.DeleteAsync(id))
             {
-                success = true,
-                message = "Quiz Succesfully Deleted",
-            });
+                return Json(new
+                {
+                    success = true,
+                    message = "Quiz Succesfully Deleted",
+                });
+            }
+            return NotFound();
         }
 
         [HttpDelete]

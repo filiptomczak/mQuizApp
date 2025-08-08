@@ -75,7 +75,7 @@ namespace Services.Service
 
             foreach (var questionVM in quizVM.Questions)
             {
-                var questionFromDb = quizFromDb.Questions.FirstOrDefault(q => q.Id == questionVM.Id);
+                var questionFromDb = quizFromDb.Questions?.FirstOrDefault(q => q.Id == questionVM.Id);
 
                 if (questionFromDb != null)
                 {
@@ -141,10 +141,9 @@ namespace Services.Service
             for (int i = 0; i < quizVM.Questions.Count; i++)
             {
                 var questionVM = quizVM.Questions[i];
-                var path = "";// SaveFile(questionVM, formFiles.ElementAtOrDefault(i));
+                var path = _fileService.SaveFile(questionVM);
 
-                quizVM.Quiz.Questions = new List<Question>();
-                quizVM.Quiz.Questions.Add(new Question
+                quizVM.Quiz?.Questions?.Add(new Question
                 {
                     Text = questionVM.Text,
                     PathToFile = path,
@@ -157,7 +156,16 @@ namespace Services.Service
                 });
             }
         }
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var quiz = await GetByIdAsync(id);
+            if (quiz == null)
+                return false;
 
+            Delete(quiz); // z BaseService
+            await _unitOfWork.CommitAsync(); // teraz zatwierdzam
+            return true;
+        }
         public async Task DeleteQuestion(int id)
         {
             var entity = await _questionService.GetByIdAsync(id);

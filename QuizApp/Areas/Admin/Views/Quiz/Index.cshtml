@@ -37,7 +37,7 @@
             event.preventDefault();
             console.log("delete [id]:" + id);
             $.ajax({
-                url: `/quiz/delete?id=${id}`,
+                url: `/admin/quiz/delete?id=${id}`,
                 type: 'DELETE',
                 success:function(data){
                     console.log(data.message);
