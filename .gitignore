@@ -401,3 +401,6 @@ FodyWeavers.xsd
 
 #appsettings
 /QuizApp/appsettings.json
+
+#root
+/QuizApp/wwwroot/images/question
