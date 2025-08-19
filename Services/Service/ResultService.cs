@@ -13,14 +13,20 @@ namespace Services.Service
     public class ResultService : IResultService
     {
         private readonly IQuizService _quizService;
-        private readonly IBaseService<TestResult> _testResultService;
+        private readonly ITestResultService _testResultService;
 
         public ResultService(IQuizService quizService,
-            IBaseService<TestResult> testResultService)
+            ITestResultService testResultService)
         {
             _quizService=quizService;
             _testResultService=testResultService;
         }
+
+        public async Task<bool> DeleteResults(int id)
+        {
+            return await _testResultService.DeleteAllByQuizIdAsync(id);
+        }
+
         public async Task<List<QuizLeaderboardVM>> GetAllQuizzesWithNResults(int n)
         {
             var quizzes = await _quizService.GetAllAsync();

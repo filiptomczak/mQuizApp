@@ -20,16 +20,22 @@ namespace QuizApp.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var top3results = _resultService.GetAllQuizzesWithNResults(3);
+            var top3results = await _resultService.GetAllQuizzesWithNResults(3);
 
-            return View(top3results.Result);
+            return View(top3results);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var allResults = _resultService.GetQuizzWithAllResults(id);
+            var allResults = await _resultService.GetQuizzWithAllResults(id);
 
-            return View(allResults.Result);
+            return View(allResults);
+        }
+
+        public async Task<IActionResult> DeleteResults(int id)
+        {
+            await _resultService.DeleteResults(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

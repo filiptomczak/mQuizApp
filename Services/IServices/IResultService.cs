@@ -9,6 +9,7 @@ namespace Services.IServices
 {
     public interface IResultService
     {
+        public Task<bool> DeleteResults(int id);
         public Task<List<QuizLeaderboardVM>> GetAllQuizzesWithNResults(int n);
         public Task<QuizLeaderboardVM> GetQuizzWithAllResults(int quizId, int n = -1);
     }

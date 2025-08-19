@@ -40,6 +40,7 @@ builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IResultService, ResultService>();
 builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<ITestResultService, TestResultService>();
 
 var app = builder.Build();
 
@@ -74,6 +75,9 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await IdentitySeeder.SeedAdminAsync(services);
+
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
 
 app.Run();

@@ -13,8 +13,16 @@
                     <li>@result.UserName – <strong>@result.Points pkt</strong></li>
                 }
             </ol>
-            <a asp-action="Details" asp-route-id="@quiz.QuizId" class="btn btn-outline-primary btn-sm">
+            <a asp-action="Details" 
+            asp-route-id="@quiz.QuizId" 
+            class="btn btn-outline-primary btn-sm">
                 Wyświetl wszystkie wyniki
+            </a>
+            <a asp-action="DeleteResults" 
+            asp-route-id="@quiz.QuizId" 
+            class="btn btn-outline-danger btn-sm" 
+            onclick="return confirm('Czy na pewno chcesz usunąć wszystkie wyniki?');">
+                Usuń wszystkie wyniki
             </a>
         </div>
     </div>
