@@ -35,6 +35,9 @@ jobs:
         with:
           name: .net-app
           path: ./publish
+          
+      - name: List published files
+        run: ls -la ./publish
 
 
   deploy:
@@ -66,4 +69,5 @@ jobs:
           package: .
 
           
+
 
