@@ -86,7 +86,7 @@ namespace Services.Service
                         {
                             _fileService.DeleteOld(questionFromDb.PathToFile);
                         }
-                        questionFromDb.PathToFile = _fileService.SaveFile(questionVM);
+                        questionFromDb.PathToFile = await _fileService.SaveFile(questionVM);
                     }
 
                     foreach (var answerVM in questionVM.Answers)
@@ -130,18 +130,18 @@ namespace Services.Service
         {
             if (quizVM.Questions.Count != 0)
             {
-                AddQuestionsToQuizFromQuizVM(quizVM);
+                await AddQuestionsToQuizFromQuizVM(quizVM);
                 
                 _unitOfWork.Quizzes.Update(quizVM.Quiz);
                 await _unitOfWork.CommitAsync();
             }
         }
-        private void AddQuestionsToQuizFromQuizVM(QuizVM quizVM)
+        private async Task AddQuestionsToQuizFromQuizVM(QuizVM quizVM)
         {
             for (int i = 0; i < quizVM.Questions.Count; i++)
             {
                 var questionVM = quizVM.Questions[i];
-                var path = _fileService.SaveFile(questionVM);
+                var path = await _fileService.SaveFile(questionVM);
 
                 quizVM.Quiz?.Questions?.Add(new Question
                 {

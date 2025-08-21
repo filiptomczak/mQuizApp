@@ -9,8 +9,8 @@ namespace Services.IServices
 {
     public interface IFileService
     {
-        public string SaveFile(QuestionVM question);
-        public void DeleteOld(string filePath);
+        public Task<string> SaveFile(QuestionVM question);
+        public Task DeleteOld(string filePath);
 
     }
 }

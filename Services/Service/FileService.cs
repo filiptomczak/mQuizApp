@@ -18,7 +18,7 @@ namespace Services.Service
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public void DeleteOld(string filePath)
+        public async Task DeleteOld(string filePath)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             var oldImgPath = Path.Combine(
@@ -30,7 +30,7 @@ namespace Services.Service
             }
         }
 
-        public string SaveFile(QuestionVM question)
+        public async Task<string> SaveFile(QuestionVM question)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             if (question.UploadedFile != null)
@@ -55,7 +55,7 @@ namespace Services.Service
                 {
                     using (var fileStream = new FileStream(Path.Combine(questionPath, fileName), FileMode.Create))
                     {
-                        question.UploadedFile.CopyTo(fileStream);
+                        await question.UploadedFile.CopyToAsync(fileStream);
                     }
                     return $"/images/question/{fileName}";
                 }
