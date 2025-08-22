@@ -37,7 +37,7 @@ namespace Services.Service
             return takeTestVM;
         }
 
-        public async Task SaveResult(TestSubmissionVM model)
+        public async Task<bool> SaveResult(TestSubmissionVM model)
         {
             var points = CheckAnswers(model.Answers);
 
@@ -48,8 +48,16 @@ namespace Services.Service
                 Points = points
             };
 
-            await _testResultService.AddAsync(testResult);
-            await _unitOfWork.CommitAsync();
+            try
+            {
+                await _testResultService.AddAsync(testResult);
+                await _unitOfWork.CommitAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private int CheckAnswers(List<SubmittedAnswerVM> answers)
