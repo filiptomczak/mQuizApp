@@ -42,9 +42,9 @@ namespace QuizApp.Areas.User.Controllers
         [HttpPost]
         public async Task<IActionResult> TakeTest(TestSubmissionVM model)
         {
-            if (!ModelState.IsValid) {
-                return RedirectToAction("TakeTest", model.QuizId);
-            }
+           // if (!ModelState.IsValid) {
+           //     return RedirectToAction("TakeTest", model.QuizId);
+           // }
 
             var isSuccess = await _testService.SaveResult(model);
             if (isSuccess)
