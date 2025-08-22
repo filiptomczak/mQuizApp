@@ -6,6 +6,7 @@ using Models.Models;
 using Models.ViewModels;
 using Services.IServices;
 using System.IO;
+using System.Text;
 
 namespace QuizApp.Areas.Admin.Controllers
 {
@@ -71,6 +72,40 @@ namespace QuizApp.Areas.Admin.Controllers
 
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Download(int id)
+        {
+            var quiz = await _quizService.GetByIdWithQuestionsAsync(id);
+            if (quiz == null)
+                return NotFound();
+            var sb=new StringBuilder();
+
+            sb.AppendLine($"Quiz: {quiz.Title}");
+            sb.AppendLine($"Opis: {quiz.Description}");
+
+            int indexQ = 1;
+            
+            if (quiz.Questions != null)
+            {
+                foreach (var question in quiz.Questions)
+                {
+                    int indexA = 65;
+                    sb.AppendLine($"{indexQ}. {question.Text}");
+                    foreach (var answer in question.Answers)
+                    {
+                        sb.AppendLine($"{(char)(indexA)}: {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
+                        indexA++;
+                    }
+                    sb.AppendLine();
+                    indexQ++;
+                }
+            }
+            var bytes=Encoding.UTF8.GetBytes(sb.ToString());
+            var fileName = $"{quiz.Title}.txt";
+            RedirectToAction(nameof(Index));
+            return File(bytes, "text/plain", fileName);
         }
 
         public IActionResult GetQuestionForm(int index)

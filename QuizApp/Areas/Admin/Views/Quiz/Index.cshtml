@@ -18,8 +18,11 @@
                         <p class="card-text text-muted">@quiz.Description</p>
                     </div>
                     <div class="card-footer bg-white d-flex justify-content-between">
-                        <a asp-action="Update" asp-route-id="@quiz.Id" class="btn btn-warning btn-sm">
+                        <a asp-action="Update" asp-route-id="@quiz.Id" class="btn btn-primary btn-sm">
                             <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a asp-action="Download" asp-route-id="@quiz.Id" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-download"></i> Download
                         </a>
                         <button class="btn btn-danger btn-sm" onclick="Delete(@quiz.Id, event)">
                             <i class="fas fa-trash-alt"></i> Delete
