@@ -42,6 +42,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IQuizExportService, QuizExportService>();
 //builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IFileService, BlobService>();
 builder.Services.AddScoped<IResultService, ResultService>();

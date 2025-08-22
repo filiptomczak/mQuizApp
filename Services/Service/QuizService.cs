@@ -1,5 +1,6 @@
 ﻿using DataAccess.IRepo;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Models.Models;
 using Models.ViewModels;
 using Services.IServices;
@@ -110,7 +111,7 @@ namespace Services.Service
                 }
                 else
                 {
-                    quizFromDb.Questions.Add(new Question
+                    quizFromDb.Questions?.Add(new Question
                     {
                         Text = questionVM.Text,
                         Answers = questionVM.Answers.Select(a => new Answer
@@ -184,7 +185,7 @@ namespace Services.Service
             var entity = await _questionService.GetByIdAsync(id);
             if (!string.IsNullOrEmpty(entity.PathToFile))
             {
-                _fileService.DeleteOld(entity.PathToFile);
+                await _fileService.DeleteOld(entity.PathToFile);
                 entity.PathToFile = null;
             }
             await _unitOfWork.CommitAsync();

@@ -11,6 +11,5 @@ namespace Services.IServices
     {
         public Task<string> SaveFile(QuestionVM question);
         public Task DeleteOld(string filePath);
-
     }
 }

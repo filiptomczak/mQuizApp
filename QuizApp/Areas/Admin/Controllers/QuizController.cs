@@ -15,10 +15,12 @@ namespace QuizApp.Areas.Admin.Controllers
     public class QuizController : Controller
     {
         private readonly IQuizService _quizService;
+        private readonly IQuizExportService _quizExportService;
 
-        public QuizController(IQuizService quizService)
+        public QuizController(IQuizService quizService, IQuizExportService quizExportService)
         {
             _quizService = quizService;
+            _quizExportService = quizExportService;
         }
 
         public async Task<IActionResult> Index()
@@ -78,33 +80,15 @@ namespace QuizApp.Areas.Admin.Controllers
         public async Task<IActionResult> Download(int id)
         {
             var quiz = await _quizService.GetByIdWithQuestionsAsync(id);
-            if (quiz == null)
-                return NotFound();
-            var sb=new StringBuilder();
+            if(quiz==null)
+                return RedirectToAction(nameof(Index));
 
-            sb.AppendLine($"Quiz: {quiz.Title}");
-            sb.AppendLine($"Opis: {quiz.Description}");
-
-            int indexQ = 1;
-            
-            if (quiz.Questions != null)
-            {
-                foreach (var question in quiz.Questions)
-                {
-                    int indexA = 65;
-                    sb.AppendLine($"{indexQ}. {question.Text}");
-                    foreach (var answer in question.Answers)
-                    {
-                        sb.AppendLine($"    {(char)(indexA)}. {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
-                        indexA++;
-                    }
-                    sb.AppendLine();
-                    indexQ++;
-                }
-            }
-            var bytes=Encoding.UTF8.GetBytes(sb.ToString());
+            var quizTxt = _quizExportService.ExportQuizAsText(quiz);
+            if(quizTxt==null) 
+                return RedirectToAction(nameof(Index));
             var fileName = $"{quiz.Title}.txt";
-            RedirectToAction(nameof(Index));
+            var bytes= Encoding.UTF8.GetBytes(quizTxt);
+
             return File(bytes, "text/plain", fileName);
         }
 

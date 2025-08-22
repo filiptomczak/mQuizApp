@@ -17,11 +17,6 @@ namespace Services.Service
 
         public BlobService(IConfiguration configuration)
         {
-            foreach (var kv in configuration.AsEnumerable())
-            {
-                Console.WriteLine($"{kv.Key} = {kv.Value}");
-            }
-
             _connectionString = configuration["BlobStorage:ConnectionString"];
             _containerName = configuration["BlobStorage:ContainerName"];
         }
