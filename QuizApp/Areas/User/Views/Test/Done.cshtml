@@ -1,0 +1,21 @@
+﻿<h2>Test wysłany do oceny!</h2>
+
+@section Scripts {
+    <script>
+        (function () {
+            // dwa wpisy, żeby „pochłonąć” 1 krok wstecz
+            history.pushState(null, "", location.href);
+            history.pushState(null, "", location.href);
+
+            window.addEventListener("popstate", function () {
+                // przesuń do przodu
+                history.go(1);
+            });
+
+            // jeśli powrót z BFCache, przeładuj (zadziała z nagłówkami no-store)
+            window.addEventListener("pageshow", function (e) {
+                if (e.persisted) location.reload();
+            });
+        })();
+    </script>
+}

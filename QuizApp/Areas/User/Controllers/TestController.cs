@@ -25,8 +25,12 @@ namespace QuizApp.Areas.User.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult TakeTest(int id)
         {
+            if (HttpContext.Session.GetString($"quiz:{id}:done") == "1")
+                return View("Done");
+
             var takeTestVM = _testService.CreateTest(id);
             if (takeTestVM == null)
             {
@@ -36,14 +40,19 @@ namespace QuizApp.Areas.User.Controllers
         }
 
         [HttpPost]
-        public IActionResult TakeTest(TestSubmissionVM model)
+        public async Task<IActionResult> TakeTest(TestSubmissionVM model)
         {
             if (!ModelState.IsValid) {
                 return RedirectToAction("TakeTest", model.QuizId);
             }
 
-            _testService.SaveResult(model);
-            return RedirectToAction(nameof(Index));
+            var isSuccess = await _testService.SaveResult(model);
+            if (isSuccess)
+            {
+                HttpContext.Session.SetString($"quiz:{model.QuizId}:done", "1");
+                return View("Done");
+            }
+            return RedirectToAction("TakeTest", model.QuizId);
         }
     }
 }
