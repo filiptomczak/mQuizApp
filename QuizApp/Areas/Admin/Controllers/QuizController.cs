@@ -95,7 +95,7 @@ namespace QuizApp.Areas.Admin.Controllers
                     sb.AppendLine($"{indexQ}. {question.Text}");
                     foreach (var answer in question.Answers)
                     {
-                        sb.AppendLine($"{(char)(indexA)}: {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
+                        sb.AppendLine($"    {(char)(indexA)}. {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
                         indexA++;
                     }
                     sb.AppendLine();
