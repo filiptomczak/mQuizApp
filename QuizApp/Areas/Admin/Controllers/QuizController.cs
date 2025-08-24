@@ -43,13 +43,51 @@ namespace QuizApp.Areas.Admin.Controllers
             var quizVM = new QuizVM()
             {
                 Quiz = quiz,
-                Questions = quiz.Questions.Select(q => new QuestionVM
+                Questions = quiz.Questions.Select(q =>
                 {
-                    Id = q.Id,
-                    PathToFile = q.PathToFile,
-                    Text = q.Text,
-                    QuizId = q.QuizId,
-                    Answers = q.Answers,
+                    var qvm = new QuestionVM
+                    {
+                        Id = q.Id,
+                        PathToFile = q.PathToFile,
+                        Text = q.Text,
+                        QuizId = q.QuizId,
+                        Type = q switch
+                        {
+                            SingleChoiceQuestion => QuestionType.SingleChoice,
+                            OpenQuestion => QuestionType.Open,
+                            MatchQuestion => QuestionType.Match,
+                            _ => throw new NotSupportedException($"Unknown question type: {q.GetType().Name}")
+                        } // np. "SingleChoiceQuestion"
+                    };
+
+                    switch (q)
+                    {
+                        case SingleChoiceQuestion scq:
+                            qvm.Answers = scq.Answers?
+                                .Select(a => new AnswerVM
+                                {
+                                    AnswerId = a.Id,
+                                    Text = a.Text,
+                                    IsCorrect = a.IsCorrect
+                                })
+                                .ToList()
+                                ?? new List<AnswerVM>();
+                            break;
+
+                        case MatchQuestion mq:
+                            qvm.Pairs = mq.Pairs?.Select(p => new PairVM
+                            {
+                                ImagePath = p.ImagePath,
+                                Label = p.Label
+                            }).ToList();
+                            break;
+
+                        case OpenQuestion oq:
+                            qvm.CorrectAnswer = oq.CorrectAnswer;
+                            break;
+                    }
+
+                    return qvm;
                 }).ToList()
             };
             return View(quizVM);
@@ -92,16 +130,24 @@ namespace QuizApp.Areas.Admin.Controllers
             return File(bytes, "text/plain", fileName);
         }
 
-        public IActionResult GetQuestionForm(int index)
+        public IActionResult GetQuestionForm(int index, string type)
         {
             var newQuestion = new QuestionVM
             {
                 Id = index,
-                Answers = new List<Answer>()
+                Answers = new List<AnswerVM>(),  // <-- zmienione na AnswerVM
+                Pairs = new List<PairVM>(),      // też warto od razu zainicjalizować
+                Type = QuestionType.SingleChoice // domyślny typ np. SingleChoice
             };
 
             ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{index}]";
-            return PartialView("_QuestionForm", newQuestion);
+            return type switch
+            {
+                "SingleChoiceQuestion" => PartialView("_SingleChoiceQuestionForm", newQuestion),
+                "MatchQuestion" => PartialView("_MatchQuestionForm", newQuestion),
+                "OpenQuestion" => PartialView("_OpenQuestionForm", newQuestion),
+                _ => PartialView("_OpenQuestionForm", newQuestion)
+            };
         }
         
         #region api

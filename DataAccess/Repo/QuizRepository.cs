@@ -18,32 +18,65 @@ namespace DataAccess.Repo
 
         public async Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id)
         {
-            return await _context.Quizzes
-                .Where(q => q.Id == id)
-                .Select(q => new TakeTestVM
-                {
-                    QuizId = q.Id,
-                    Title = q.Title,
-                    Description = q.Description,
-                    Questions = q.Questions.Select(ques => new TakeQuestionVM
-                    {
-                        QuestionId = ques.Id,
-                        Text = ques.Text,
-                        ImgPath = ques.PathToFile,
-                        Answers = ques.Answers.Select(a => a.Text).ToList()
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync();
-        }
+            var quiz = await _context.Quizzes
+        .Include(q => q.Questions)
+            .ThenInclude(q => (q as SingleChoiceQuestion)!.Answers) // ładowanie odpowiedzi
+        .Include(q => q.Questions)
+            .ThenInclude(q => (q as MatchQuestion)!.Pairs) // ładowanie par
+        .FirstOrDefaultAsync(q => q.Id == id);
 
-        /*
-         * public async Task<TakeTestVM> GetTestVMWithQuestionsAndAnswersAsync(int id)
-        {
-            return _context.Quizzes
-                .Include(q => q.Questions)
-                    .ThenInclude(q => q.Answers)
-                .FirstOrDefaultAsync(q => q.Id == id);
+            if (quiz == null) return null;
+
+            var vm = new TakeTestVM
+            {
+                QuizId = quiz.Id,
+                Title = quiz.Title,
+                Description = quiz.Description,
+                Questions = quiz.Questions.Select(ques =>
+                {
+                    if (ques is SingleChoiceQuestion sc)
+                    {
+                        return new TakeQuestionVM
+                        {
+                            QuestionId = sc.Id,
+                            Text = sc.Text,
+                            ImgPath = sc.PathToFile,
+                            Type = QuestionType.SingleChoice,
+                            Answers = sc.Answers.Select(a => a.Text).ToList()
+                        };
+                    }
+                    else if (ques is MatchQuestion mq)
+                    {
+                        return new TakeQuestionVM
+                        {
+                            QuestionId = mq.Id,
+                            Text = mq.Text,
+                            ImgPath = mq.PathToFile,
+                            Type = QuestionType.Match,
+                            Pairs = mq.Pairs.Select(p => new MatchPairVM
+                            {
+                                Id = p.Id,
+                                ImagePath = p.ImagePath,
+                                Label = p.Label
+                            }).ToList()
+                        };
+                    }
+                    else if (ques is OpenQuestion oq)
+                    {
+                        return new TakeQuestionVM
+                        {
+                            QuestionId = oq.Id,
+                            Text = oq.Text,
+                            ImgPath = oq.PathToFile,
+                            Type = QuestionType.Open
+                        };
+                    }
+
+                    throw new InvalidOperationException("Unknown question type");
+                }).ToList()
+            };
+
+            return vm;
         }
-         */
     }
 }

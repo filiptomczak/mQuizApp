@@ -45,9 +45,9 @@
                 var answerPrefix = $"{prefix}.Answers[{j}]";
                 <div class="answer-block border rounded p-3 mb-2">
                     <div class="mb-2">
-                        @if (Model.Answers[j].Id != 0)
+                        @if (Model.Answers[j].AnswerId != 0)
                         {
-                            <input asp-for="@Model.Answers[j].Id" type="hidden" />
+                            <input asp-for="@Model.Answers[j].AnswerId" type="hidden" />
                         }
                         <label class="form-label fw-bold">Odpowiedź:</label>
                         <input asp-for="@Model.Answers[j].Text" class="form-control"/>
@@ -58,7 +58,7 @@
                         <input type="hidden" name="@($"{prefix}.Answers[{j}].IsCorrect")" value="false" />
                         <label class="form-check-label">Poprawna</label>
                     </div>
-                    <button id="@Model.Answers[j].Id"  type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
+                    <button id="@Model.Answers[j].AnswerId" type="button" class="btn btn-outline-danger delete-answer mt-2" onclick="deleteAnswer(this)">Usuń odpowiedź</button>
                 </div>
             }
         </div>

@@ -30,10 +30,27 @@
         <div id="question-container">
             @for (int i = 0; i < Model.Questions.Count; i++)
             {
-                ViewData.TemplateInfo.HtmlFieldPrefix = $"Questions[{i}]";
-                @Html.Partial("_QuestionForm",Model.Questions[i])
+                var q = Model.Questions[i];
+                switch (q.Type)
+                {
+                    case QuestionType.SingleChoice:
+                        @Html.Partial("_SingleChoiceQuestionForm", q)
+                        break;
+                    case QuestionType.Match:
+                        @Html.Partial("_MatchQuestionForm", q)
+                        break;
+                    case QuestionType.Open:
+                        @Html.Partial("_OpenQuestionForm", q)
+                        break;
+                }
             }
         </div>
+        <label>Wybierz typ pytania:</label>
+        <select id="questionType" class="form-control">
+            <option value="SingleChoiceQuestion">Jednokrotny wybór</option>
+            <option value="MatchQuestion">Dopasowanie</option>
+            <option value="OpenQuestion">Otwarte</option>
+        </select>
 
         <div class="button-container d-flex justify-content-between align-items-center mb-4">
             <button type="button" class="btn btn-outline-primary" onclick="addQuestion()">
@@ -49,18 +66,31 @@
 
 @section Scripts{
 <script>
+    function removeQuestion(questionId) {
+        $("#" + questionId).remove();
+    }
 
-    let questionIndex = @Model.Questions.Count;
-
-    function addQuestion() {
-        fetch(`/Admin/Quiz/GetQuestionForm?index=${questionIndex}`)
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
-                document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
-                questionIndex++;
-            });
-    };
+    let questionIndex = @Model.Questions.Count
+   
+        function addQuestion() {
+                const type = document.getElementById("questionType").value;
+                fetch(`/Admin/Quiz/GetQuestionForm?index=${questionIndex}&type=${type}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
+                    document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
+                    questionIndex++;
+                });
+        };
+    // function addQuestion() {
+    //     fetch(`/Admin/Quiz/GetQuestionForm?index=${questionIndex}`)
+    //         .then(res => res.text())
+    //         .then(html => {
+    //             document.getElementById('question-container').insertAdjacentHTML('beforeend', html);
+    //             document.getElementById(`question-Questions[${questionIndex}]`).setAttribute('data-new','true')
+    //             questionIndex++;
+    //         });
+    // };
 
     function addAnswer(button) {
         const container = button.closest('.question-block').querySelector('.answers-container');
@@ -150,12 +180,4 @@
        
     }
 </script>
-
-    @* <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: 'anchor autolink charmap codesample emoticons   table visualblocks wordcount',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
-        });
-    </script> *@
 }

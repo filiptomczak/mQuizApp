@@ -13,6 +13,11 @@ namespace DataAccess.IRepo
         public IQuizRepository Quizzes { get; }
         public IBaseRepository<Answer> Answers { get; }
         public IBaseRepository<TestResult> TestResults { get; }
+
+        public ISingleChoiceRepository SingleChoices { get; }
+        public IMatchRepository Matches { get; }
+        public IOpenRepository Opens { get; }
+
         public Task CommitAsync();
     }
 }

@@ -1,0 +1,16 @@
+﻿@model Models.ViewModels.QuestionVM
+
+<div class="question-block border p-3 mb-3" id="question-@ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_")">
+    <button type="button" class="btn btn-danger btn-sm float-end" onclick="removeQuestion('@ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_")')">Usuń</button>
+
+<div class="open-question">
+    <label>Pytanie:</label>
+    <input asp-for="Text" class="form-control" />
+
+    <label>Ścieżka do pliku (opcjonalnie):</label>
+    <input asp-for="PathToFile" class="form-control" />
+
+    <label>Poprawna odpowiedź (opcjonalnie):</label>
+    <input asp-for="CorrectAnswer" class="form-control" placeholder="Poprawna odpowiedź" />
+</div>
+</div>

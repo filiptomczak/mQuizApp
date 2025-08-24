@@ -20,6 +20,7 @@ namespace Services.Service
             var sb = new StringBuilder();
             sb.AppendLine($"Quiz: {quiz.Title}");
             sb.AppendLine($"Opis: {quiz.Description}");
+            sb.AppendLine();
 
             int indexQ = 1;
 
@@ -27,17 +28,42 @@ namespace Services.Service
             {
                 foreach (var question in quiz.Questions)
                 {
-                    int indexA = 65;
                     sb.AppendLine($"{indexQ}. {question.Text}");
-                    foreach (var answer in question.Answers)
+
+                    switch (question)
                     {
-                        sb.AppendLine($"    {(char)(indexA)}. {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
-                        indexA++;
+                        case SingleChoiceQuestion scq:
+                            int indexA = 65;
+                            foreach (var answer in scq.Answers)
+                            {
+                                sb.AppendLine($"    {(char)indexA}. {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
+                                indexA++;
+                            }
+                            break;
+
+                        case MatchQuestion mq:
+                            sb.AppendLine("    [Dopasuj pary]");
+                            foreach (var pair in mq.Pairs)
+                            {
+                                sb.AppendLine($"    - {pair.Label} => {pair.ImagePath}");
+                            }
+                            break;
+
+                        case OpenQuestion oq:
+                            sb.AppendLine("    [Otwarta odpowiedź]");
+                            sb.AppendLine($"    Poprawna: {oq.CorrectAnswer}");
+                            break;
+
+                        default:
+                            sb.AppendLine("    [Nieznany typ pytania]");
+                            break;
                     }
+
                     sb.AppendLine();
                     indexQ++;
                 }
             }
+
             return sb.ToString();
         }
     }

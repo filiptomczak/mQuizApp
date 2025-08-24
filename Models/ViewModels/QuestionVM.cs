@@ -14,8 +14,18 @@ namespace Models.ViewModels
         public string? Text { get; set; }
         public string? PathToFile { get; set; }
         public int QuizId { get; set; }
-        public IFormFile? UploadedFile { get; set; }  // tylko na potrzeby przesy³ania
-        public List<Answer> Answers { get; set; } = new List<Answer>();
+        public IFormFile? UploadedFile { get; set; }  // tylko do przesy³ania nowych plików
+
+        public QuestionType Type { get; set; }  // zmiana na enum zamiast stringa
+
+        // tylko dla SingleChoice
+        public List<AnswerVM> Answers { get; set; } = new();
+
+        // tylko dla Match
+        public List<PairVM> Pairs { get; set; } = new();
+
+        // tylko dla Open
+        public string? CorrectAnswer { get; set; }
 
     }
 }

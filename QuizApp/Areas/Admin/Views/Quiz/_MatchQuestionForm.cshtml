@@ -1,0 +1,44 @@
+﻿@model Models.ViewModels.QuestionVM
+
+<div class="question-block border p-3 mb-3" id="question-@ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_")">
+    <button type="button" class="btn btn-danger btn-sm float-end" onclick="removeQuestion('@ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_")')">Usuń</button>
+
+<div class="match-question">
+    <label>Pytanie:</label>
+    <input asp-for="Text" class="form-control" />
+
+    <label>Ścieżka do pliku (opcjonalnie):</label>
+    <input asp-for="PathToFile" class="form-control" />
+
+    <div class="pairs">
+        <label>Pary do dopasowania:</label>
+        <div id="pairs-@Model.Id">
+            @for (int i = 0; i < Model.Pairs.Count; i++)
+            {
+                <div class="pair-item">
+                    <input name="Questions[@Model.Id].Pairs[@i].Label" class="form-control" placeholder="Etykieta" />
+                    <input name="Questions[@Model.Id].Pairs[@i].ImagePath" class="form-control" placeholder="Ścieżka do obrazka" />
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removePair(this)">Usuń</button>
+                </div>
+            }
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="addPair(@Model.Id)">Dodaj parę</button>
+    </div>
+</div>
+</div>
+<script>
+    function addPair(questionId) {
+        const container = document.getElementById(`pairs-${questionId}`);
+        const index = container.children.length;
+        const div = document.createElement('div');
+        div.className = 'pair-item';
+        div.innerHTML = `<input name="Questions[${questionId}].Pairs[${index}].Label" class="form-control" placeholder="Etykieta" />
+                         <input name="Questions[${questionId}].Pairs[${index}].ImagePath" class="form-control" placeholder="Ścieżka do obrazka" />
+                         <button type="button" class="btn btn-sm btn-danger" onclick="removePair(this)">Usuń</button>`;
+        container.appendChild(div);
+    }
+
+    function removePair(button) {
+        button.parentElement.remove();
+    }
+</script>

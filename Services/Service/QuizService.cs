@@ -50,23 +50,44 @@ namespace Services.Service
         public async Task<Quiz> GetByIdWithQuestionsAsync(int id)
         {
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
+
+            if (quiz == null)
+                return null;
+
             var questions = await _questionService.GetAllAsync();
             var answers = await _answerService.GetAllAsync();
-            
-            quiz.Questions = questions
-                .Where(q => q.QuizId == quiz.Id)
-                .Select(q =>
+
+            // tylko te pytania, które należą do quizu
+            var filteredQuestions = questions.Where(q => q.QuizId == quiz.Id).ToList();
+
+            foreach (var q in filteredQuestions)
+            {
+                if (q is SingleChoiceQuestion scq)
                 {
-                    q.Answers = answers.Where(a => a.QuestionId == q.Id).ToList();
-                    return q;
-                }).ToList();
+                    scq.Answers = answers.Where(a => a.QuestionId == scq.Id).ToList();
+                }
+                else if (q is MatchQuestion mq)
+                {
+                    // tutaj np. PairService.GetAllByQuestionId(mq.Id)
+                    mq.Pairs = new List<MatchPair>();
+                }
+                else if (q is OpenQuestion oq)
+                {
+                    // open question nie ma answers → nic nie robimy
+                }
+            }
+
+            quiz.Questions = filteredQuestions.Cast<QuestionBase>().ToList();
 
             return quiz;
         }
 
         public async Task UpdateQuizAsync(QuizVM quizVM)
         {
-            var quizFromDb = _unitOfWork.Quizzes.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
+            var quizFromDb = _unitOfWork.Quizzes.Get(
+                x => x.Id == quizVM.Quiz.Id,
+                "Questions" // EF Core nie załaduje polimorficznych answers jednym stringiem
+            );
 
             if (quizFromDb == null)
                 throw new Exception("Quiz not found");
@@ -81,7 +102,8 @@ namespace Services.Service
                 if (questionFromDb != null)
                 {
                     questionFromDb.Text = questionVM.Text;
-                    if (questionVM.UploadedFile!=null)
+
+                    if (questionVM.UploadedFile != null)
                     {
                         if (!string.IsNullOrEmpty(questionFromDb.PathToFile))
                         {
@@ -90,42 +112,74 @@ namespace Services.Service
                         questionFromDb.PathToFile = await _fileService.SaveFile(questionVM);
                     }
 
-                    foreach (var answerVM in questionVM.Answers)
+                    // obsługa SingleChoice
+                    if (questionFromDb is SingleChoiceQuestion scq)
                     {
-                        var answerFromDb = questionFromDb.Answers.FirstOrDefault(a => a.Id == answerVM.Id);
+                        foreach (var answerVM in questionVM.Answers)
+                        {
+                            var answerFromDb = scq.Answers.FirstOrDefault(a => a.Id == answerVM.AnswerId);
 
-                        if (answerFromDb != null)
-                        {
-                            answerFromDb.Text = answerVM.Text;
-                            answerFromDb.IsCorrect = answerVM.IsCorrect;
-                        }
-                        else
-                        {
-                            questionFromDb.Answers.Add(new Answer
+                            if (answerFromDb != null)
                             {
-                                Text = answerVM.Text,
-                                IsCorrect = answerVM.IsCorrect
-                            });
+                                answerFromDb.Text = answerVM.Text;
+                                answerFromDb.IsCorrect = answerVM.IsCorrect;
+                            }
+                            else
+                            {
+                                scq.Answers.Add(new Answer
+                                {
+                                    Text = answerVM.Text,
+                                    IsCorrect = answerVM.IsCorrect
+                                });
+                            }
                         }
                     }
+                    // obsługa MatchQuestion i OpenQuestion → TODO
                 }
                 else
                 {
-                    quizFromDb.Questions?.Add(new Question
+                    // nowe pytanie
+                    if (questionVM.Type == QuestionType.SingleChoice)
                     {
-                        Text = questionVM.Text,
-                        Answers = questionVM.Answers.Select(a => new Answer
+                        quizFromDb.Questions.Add(new SingleChoiceQuestion
                         {
-                            Text = a.Text,
-                            IsCorrect = a.IsCorrect
-                        }).ToList()
-                    });
+                            Text = questionVM.Text,
+                            PathToFile = await _fileService.SaveFile(questionVM),
+                            QuizId = quizFromDb.Id,
+                            Answers = questionVM.Answers.Select(a => new Answer
+                            {
+                                Text = a.Text,
+                                IsCorrect = a.IsCorrect
+                            }).ToList()
+                        });
+                    }
+                    else if (questionVM.Type == QuestionType.Match)
+                    {
+                        quizFromDb.Questions.Add(new MatchQuestion
+                        {
+                            Text = questionVM.Text,
+                            PathToFile = await _fileService.SaveFile(questionVM),
+                            QuizId = quizFromDb.Id,
+                            Pairs = new List<MatchPair>() // TODO: mapowanie par z VM
+                        });
+                    }
+                    else if (questionVM.Type == QuestionType.Open)
+                    {
+                        quizFromDb.Questions.Add(new OpenQuestion
+                        {
+                            Text = questionVM.Text,
+                            PathToFile = await _fileService.SaveFile(questionVM),
+                            QuizId = quizFromDb.Id,
+                            CorrectAnswer = questionVM.CorrectAnswer
+                        });
+                    }
                 }
             }
 
             _unitOfWork.Quizzes.Update(quizFromDb);
             await _unitOfWork.CommitAsync();
         }
+
 
         public async Task CreateNewQuizAsync(QuizVM quizVM)
         {
@@ -139,24 +193,47 @@ namespace Services.Service
         }
         private async Task AddQuestionsToQuizFromQuizVM(QuizVM quizVM)
         {
-            for (int i = 0; i < quizVM.Questions.Count; i++)
+            foreach (var questionVM in quizVM.Questions)
             {
-                var questionVM = quizVM.Questions[i];
                 var path = await _fileService.SaveFile(questionVM);
 
-                quizVM.Quiz?.Questions?.Add(new Question
+                if (questionVM.Type == QuestionType.SingleChoice)
                 {
-                    Text = questionVM.Text,
-                    PathToFile = path,
-                    QuizId = quizVM.Quiz.Id,
-                    Answers = questionVM.Answers.Select(a => new Answer
+                    quizVM.Quiz?.Questions?.Add(new SingleChoiceQuestion
                     {
-                        Text = a.Text,
-                        IsCorrect = a.IsCorrect
-                    }).ToList()
-                });
+                        Text = questionVM.Text,
+                        PathToFile = path,
+                        QuizId = quizVM.Quiz.Id,
+                        Answers = questionVM.Answers.Select(a => new Answer
+                        {
+                            Text = a.Text,
+                            IsCorrect = a.IsCorrect
+                        }).ToList()
+                    });
+                }
+                else if (questionVM.Type == QuestionType.Match)
+                {
+                    quizVM.Quiz?.Questions?.Add(new MatchQuestion
+                    {
+                        Text = questionVM.Text,
+                        PathToFile = path,
+                        QuizId = quizVM.Quiz.Id,
+                        Pairs = new List<MatchPair>() // mapowanie z VM
+                    });
+                }
+                else if (questionVM.Type == QuestionType.Open)
+                {
+                    quizVM.Quiz?.Questions?.Add(new OpenQuestion
+                    {
+                        Text = questionVM.Text,
+                        PathToFile = path,
+                        QuizId = quizVM.Quiz.Id,
+                        CorrectAnswer = questionVM.CorrectAnswer
+                    });
+                }
             }
         }
+
         public async Task<bool> DeleteAsync(int id)
         {
             var quiz = await GetByIdAsync(id);

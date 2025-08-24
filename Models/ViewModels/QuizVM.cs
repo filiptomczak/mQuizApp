@@ -10,6 +10,6 @@ namespace Models.ViewModels
     public class QuizVM
     {
         public Quiz Quiz { get; set; }
-        public List<QuestionVM> Questions { get; set; } //= new List<Question>();
+        public List<QuestionVM> Questions { get; set; } = new();
     }
 }
