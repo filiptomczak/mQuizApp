@@ -30,7 +30,7 @@ namespace DataAccess.Repo
                         QuestionId = ques.Id,
                         Text = ques.Text,
                         ImgPath = ques.PathToFile,
-                        Answers = ques.Answers.Select(a => a.Text).ToList()
+                        //Answers = ques.Answers.Select(a => a.Text).ToList()
                     }).ToList()
                 })
                 .FirstOrDefaultAsync();

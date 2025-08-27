@@ -49,7 +49,7 @@ namespace QuizApp.Areas.Admin.Controllers
                     PathToFile = q.PathToFile,
                     Text = q.Text,
                     QuizId = q.QuizId,
-                    Answers = q.Answers,
+                    //Answers = q.Answers,
                 }).ToList()
             };
             return View(quizVM);
@@ -92,6 +92,11 @@ namespace QuizApp.Areas.Admin.Controllers
             return File(bytes, "text/plain", fileName);
         }
 
+        /// <summary>
+        /// Get partial view when new question is added by user
+        /// </summary>
+        /// <param name="index">Index of newly created question</param>
+        /// <returns>Partial View for new question</returns>
         public IActionResult GetQuestionForm(int index)
         {
             var newQuestion = new QuestionVM

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Services.IServices
 {
-    public interface IQuestionService:IBaseService<Question>
+    public interface IQuestionService:IBaseService<QuestionBase>
     {
-        public void UpdateRange(IEnumerable<Question> questions);
+        public void UpdateRange(IEnumerable<QuestionBase> questions);
     }
 }

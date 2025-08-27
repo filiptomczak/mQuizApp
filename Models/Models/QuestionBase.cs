@@ -1,23 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Models.Models
 {
-    public class Answer
+    public abstract class QuestionBase
     {
+        [Key]
         public int Id { get; set; }
         [Required]
         public string Text { get; set; }=string.Empty;
-        public bool IsCorrect { get; set; }=false;
-        public int QuestionId { get; set; }
-        [ForeignKey(nameof(QuestionId))]
+        public string? PathToFile { get; set; }
+        public int QuizId { get; set; }
+        [ForeignKey(nameof(QuizId))]
         [ValidateNever]
-        public SingleChoiceQuestion? Question { get; set; }
+        public Quiz? Quiz { get; set; }
     }
 }

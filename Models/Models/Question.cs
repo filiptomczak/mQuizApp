@@ -15,6 +15,6 @@ namespace Models.Models
         [ForeignKey("QuizId")]
         [ValidateNever]
         public Quiz? Quiz { get; set; }
-        public List<Answer> Answers { get; set; } = new List<Answer>();
+        public List<Answer> Answers { get; set; } = new();
     }
 }

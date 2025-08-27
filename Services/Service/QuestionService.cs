@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace Services.Service
 {
-    public class QuestionService : BaseService<Question>, IQuestionService
+    public class QuestionService : BaseService<QuestionBase>, IQuestionService
     {
         private readonly IUnitOfWork _unitOfWork;
 
         public QuestionService(IUnitOfWork unitOfWork) : base(unitOfWork.Questions)
         {
             _unitOfWork=unitOfWork;
-        }
+        }     
 
-        public void UpdateRange(IEnumerable<Question> questions)
+        public void UpdateRange(IEnumerable<QuestionBase> questions)
         {
             _unitOfWork.Questions.UpdateRange(questions);
         }

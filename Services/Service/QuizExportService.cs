@@ -29,11 +29,11 @@ namespace Services.Service
                 {
                     int indexA = 65;
                     sb.AppendLine($"{indexQ}. {question.Text}");
-                    foreach (var answer in question.Answers)
-                    {
-                        sb.AppendLine($"    {(char)(indexA)}. {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
-                        indexA++;
-                    }
+                    //foreach (var answer in question.Answers)
+                    //{
+                    //    sb.AppendLine($"    {(char)(indexA)}. {answer.Text} {(answer.IsCorrect ? "(✓)" : "")}");
+                    //    indexA++;
+                    //}
                     sb.AppendLine();
                     indexQ++;
                 }

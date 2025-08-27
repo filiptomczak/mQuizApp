@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepo
 {
-    public interface IQuestionRepository:IBaseRepository<Question>
+    public interface IQuestionRepository : IBaseRepository<QuestionBase>
     {
-        public void UpdateRange(IEnumerable<Question> questions);
+        public void UpdateRange(IEnumerable<QuestionBase> questions);
+        public Task<IEnumerable<QuestionBase>> GetByQuizIdAsync(int quizId);
     }
 }

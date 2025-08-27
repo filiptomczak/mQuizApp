@@ -42,7 +42,7 @@ namespace Services.Service
             var questions = await _questionService.GetAllAsync();
             foreach (var quiz in quizes)
             {
-                quiz.Questions = questions.Where(q => q.QuizId == quiz.Id).ToList();
+                //quiz.Questions = questions.Where(q => q.QuizId == quiz.Id).ToList();
             }
             return quizes;
         }
@@ -52,7 +52,7 @@ namespace Services.Service
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
             var questions = await _questionService.GetAllAsync();
             var answers = await _answerService.GetAllAsync();
-            
+
             quiz.Questions = questions
                 .Where(q => q.QuizId == quiz.Id)
                 .Select(q =>
@@ -60,10 +60,8 @@ namespace Services.Service
                     q.Answers = answers.Where(a => a.QuestionId == q.Id).ToList();
                     return q;
                 }).ToList();
-
             return quiz;
         }
-
         public async Task UpdateQuizAsync(QuizVM quizVM)
         {
             var quizFromDb = _unitOfWork.Quizzes.Get(x => x.Id == quizVM.Quiz.Id, "Questions,Questions.Answers");
@@ -92,34 +90,34 @@ namespace Services.Service
 
                     foreach (var answerVM in questionVM.Answers)
                     {
-                        var answerFromDb = questionFromDb.Answers.FirstOrDefault(a => a.Id == answerVM.Id);
+                        //var answerFromDb = questionFromDb.Answers.FirstOrDefault(a => a.Id == answerVM.Id);
 
-                        if (answerFromDb != null)
-                        {
-                            answerFromDb.Text = answerVM.Text;
-                            answerFromDb.IsCorrect = answerVM.IsCorrect;
-                        }
-                        else
-                        {
-                            questionFromDb.Answers.Add(new Answer
-                            {
-                                Text = answerVM.Text,
-                                IsCorrect = answerVM.IsCorrect
-                            });
-                        }
+                        //if (answerFromDb != null)
+                        //{
+                        //    answerFromDb.Text = answerVM.Text;
+                        //    answerFromDb.IsCorrect = answerVM.IsCorrect;
+                        //}
+                        //else
+                        //{
+                        //    questionFromDb.Answers.Add(new Answer
+                        //    {
+                        //        Text = answerVM.Text,
+                        //        IsCorrect = answerVM.IsCorrect
+                        //    });
+                        //}
                     }
                 }
                 else
                 {
-                    quizFromDb.Questions?.Add(new Question
-                    {
-                        Text = questionVM.Text,
-                        Answers = questionVM.Answers.Select(a => new Answer
-                        {
-                            Text = a.Text,
-                            IsCorrect = a.IsCorrect
-                        }).ToList()
-                    });
+                    //quizFromDb.Questions?.Add(new Question
+                    //{
+                    //    Text = questionVM.Text,
+                    //    Answers = questionVM.Answers.Select(a => new Answer
+                    //    {
+                    //        Text = a.Text,
+                    //        IsCorrect = a.IsCorrect
+                    //    }).ToList()
+                    //});
                 }
             }
 
@@ -144,17 +142,17 @@ namespace Services.Service
                 var questionVM = quizVM.Questions[i];
                 var path = await _fileService.SaveFile(questionVM);
 
-                quizVM.Quiz?.Questions?.Add(new Question
-                {
-                    Text = questionVM.Text,
-                    PathToFile = path,
-                    QuizId = quizVM.Quiz.Id,
-                    Answers = questionVM.Answers.Select(a => new Answer
-                    {
-                        Text = a.Text,
-                        IsCorrect = a.IsCorrect
-                    }).ToList()
-                });
+                //quizVM.Quiz?.Questions?.Add(new Question
+                //{
+                //    Text = questionVM.Text,
+                //    PathToFile = path,
+                //    QuizId = quizVM.Quiz.Id,
+                //    Answers = questionVM.Answers.Select(a => new Answer
+                //    {
+                //        Text = a.Text,
+                //        IsCorrect = a.IsCorrect
+                //    }).ToList()
+                //});
             }
         }
         public async Task<bool> DeleteAsync(int id)

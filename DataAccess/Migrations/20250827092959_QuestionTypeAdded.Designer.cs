@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250827092959_QuestionTypeAdded")]
+    partial class QuestionTypeAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,7 +271,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("MatchPairs");
+                    b.ToTable("MatchOptions");
                 });
 
             modelBuilder.Entity("Models.Models.QuestionBase", b =>
@@ -321,14 +324,6 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Quizzes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Sprawdzamy wiedzę ogólną",
-                            Title = "Test wiedzy ogólnej"
-                        });
                 });
 
             modelBuilder.Entity("Models.Models.TestResult", b =>
@@ -377,14 +372,6 @@ namespace DataAccess.Migrations
                     b.HasBaseType("Models.Models.QuestionBase");
 
                     b.HasDiscriminator().HasValue(1);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            QuizId = 1,
-                            Text = "Pytanie 1"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

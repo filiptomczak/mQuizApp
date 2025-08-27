@@ -10,13 +10,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repo
 {
-    public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
+    public class QuestionRepository : BaseRepository<QuestionBase>, IQuestionRepository
     {
         public QuestionRepository(AppDbContext context) : base(context)
         {
         }
-
-        public void UpdateRange(IEnumerable<Question> questions)
+        public async Task<IEnumerable<QuestionBase>> GetByQuizIdAsync(int quizId)
+        {
+            return await _context.Questions
+                .Where(q => q.QuizId == quizId)
+                .ToListAsync();
+        }
+        public void UpdateRange(IEnumerable<QuestionBase> questions)
         {
             _context.Questions.UpdateRange(questions);
         }
