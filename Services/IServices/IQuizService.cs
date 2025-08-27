@@ -13,7 +13,7 @@ namespace Services.IServices
     {
         public Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id);
         public Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync();
-        public Task<Quiz> GetByIdWithQuestionsAsync(int id);
+        public Task<Quiz> GetByIdWithQuestionsAndAnswersAsync(int id);
         public Task UpdateQuizAsync(QuizVM quizVM);
         public Task CreateNewQuizAsync(QuizVM quizVM);
         public Task DeleteQuestion(int id);

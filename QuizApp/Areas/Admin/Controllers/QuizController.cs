@@ -25,7 +25,7 @@ namespace QuizApp.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var quizes = await _quizService.GetAllWithQuestionsAsync();
+            var quizes = await _quizService.GetAllAsync();
             return View(quizes);
         }
 
@@ -38,7 +38,7 @@ namespace QuizApp.Areas.Admin.Controllers
                     Questions = new List<QuestionVM>() 
                 });
 
-            var quiz = await _quizService.GetByIdWithQuestionsAsync(id);
+            var quiz = await _quizService.GetByIdWithQuestionsAndAnswersAsync(id);
 
             var quizVM = new QuizVM()
             {
@@ -79,7 +79,7 @@ namespace QuizApp.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Download(int id)
         {
-            var quiz = await _quizService.GetByIdWithQuestionsAsync(id);
+            var quiz = await _quizService.GetByIdWithQuestionsAndAnswersAsync(id);
             if(quiz==null)
                 return RedirectToAction(nameof(Index));
 

@@ -241,7 +241,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Answer");
+                    b.ToTable("Answers");
                 });
 
             modelBuilder.Entity("Models.Models.Question", b =>

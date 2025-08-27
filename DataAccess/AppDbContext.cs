@@ -8,7 +8,7 @@ namespace DataAccess
 {
     public class AppDbContext : IdentityDbContext<IdentityUser>
     {
-        //public DbSet<Answer>Answers { get; set; }
+        public DbSet<Answer>Answers { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Quiz>Quizzes { get; set; }
         public DbSet<TestResult> Results { get; set; }
@@ -22,6 +22,8 @@ namespace DataAccess
         {          
 
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Answer>().ToTable("Answers");
+
             var q1 = new Question
             {
                 Id = 1,

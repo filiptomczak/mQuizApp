@@ -16,6 +16,14 @@ namespace DataAccess.Repo
         {
         }
 
+        public async Task<Quiz> GetQuizWithQuestionsAndAnswersAsync(int id)
+        {
+            return await _context.Quizzes
+                .Include(q => q.Questions)
+                    .ThenInclude(q => q.Answers)
+                .FirstOrDefaultAsync(q => q.Id == id);
+        }
+
         public async Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id)
         {
             return await _context.Quizzes

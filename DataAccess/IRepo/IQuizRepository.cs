@@ -11,5 +11,6 @@ namespace DataAccess.IRepo
     public interface IQuizRepository : IBaseRepository<Quiz>
     {
         public Task<TakeTestVM?> GetTestVMWithQuestionsAndAnswersAsync(int id);
+        public Task<Quiz> GetQuizWithQuestionsAndAnswersAsync(int id);
     }
 }

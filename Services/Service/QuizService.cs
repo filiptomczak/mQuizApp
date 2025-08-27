@@ -39,29 +39,30 @@ namespace Services.Service
         public async Task<IEnumerable<Quiz>> GetAllWithQuestionsAsync()
         {
             var quizes = await _unitOfWork.Quizzes.GetAllAsync();
-            var questions = await _questionService.GetAllAsync();
+            /*var questions = await _questionService.GetAllAsync();
             foreach (var quiz in quizes)
             {
                 quiz.Questions = questions.Where(q => q.QuizId == quiz.Id).ToList();
-            }
+            }*/
             return quizes;
         }
 
-        public async Task<Quiz> GetByIdWithQuestionsAsync(int id)
+        public async Task<Quiz> GetByIdWithQuestionsAndAnswersAsync(int id)
         {
-            var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
-            var questions = await _questionService.GetAllAsync();
-            var answers = await _answerService.GetAllAsync();
-            
-            quiz.Questions = questions
-                .Where(q => q.QuizId == quiz.Id)
-                .Select(q =>
-                {
-                    q.Answers = answers.Where(a => a.QuestionId == q.Id).ToList();
-                    return q;
-                }).ToList();
 
-            return quiz;
+            return await _unitOfWork.Quizzes.GetQuizWithQuestionsAndAnswersAsync(id);
+            //var questions = await _questionService.GetAllAsync();
+            //var answers = await _answerService.GetAllAsync();
+            
+            //quiz.Questions = questions
+            //    .Where(q => q.QuizId == quiz.Id)
+            //    .Select(q =>
+            //    {
+            //        q.Answers = answers.Where(a => a.QuestionId == q.Id).ToList();
+            //        return q;
+            //    }).ToList();
+
+            //return quiz;
         }
 
         public async Task UpdateQuizAsync(QuizVM quizVM)
