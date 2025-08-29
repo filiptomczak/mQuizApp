@@ -82,6 +82,8 @@ namespace Services.Service
                 if (questionFromDb != null)
                 {
                     questionFromDb.Text = questionVM.Text;
+                    questionFromDb.Points = questionVM.Points;
+
                     if (questionVM.UploadedFile!=null)
                     {
                         if (!string.IsNullOrEmpty(questionFromDb.PathToFile))
@@ -115,6 +117,7 @@ namespace Services.Service
                     quizFromDb.Questions?.Add(new Question
                     {
                         Text = questionVM.Text,
+                        Points = questionVM.Points,
                         Answers = questionVM.Answers.Select(a => new Answer
                         {
                             Text = a.Text,
@@ -150,6 +153,7 @@ namespace Services.Service
                     Text = questionVM.Text,
                     PathToFile = path,
                     QuizId = quizVM.Quiz.Id,
+                    Points=quizVM.Questions[i].Points,
                     Answers = questionVM.Answers.Select(a => new Answer
                     {
                         Text = a.Text,

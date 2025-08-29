@@ -12,6 +12,7 @@ namespace Models.Models
         public string? Text { get; set; }
         public string? PathToFile{ get; set; }
         public int QuizId { get; set; }
+        public float Points { get; set; } = 1.0f;
         [ForeignKey("QuizId")]
         [ValidateNever]
         public Quiz? Quiz { get; set; }

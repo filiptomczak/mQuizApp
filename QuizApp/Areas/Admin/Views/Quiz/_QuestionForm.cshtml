@@ -17,6 +17,8 @@
             <div class="input-group mb-2 position-relative">
 
                 <input asp-for="Text" class="form-control" placeholder="Wpisz pytanie..." />
+                <input asp-for="Points" type="number" step="0.05" class="form-control" placeholder="1.0" />
+
                 <button class="btn btn-outline-secondary" type="button" onclick="toggleFileInput(this)">
                     <i class="fa-regular fa-image"></i> Dodaj obraz
                 </button>

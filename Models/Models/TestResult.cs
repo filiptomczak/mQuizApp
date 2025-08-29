@@ -11,7 +11,7 @@ namespace Models.Models
         public int Id {  get; set; }
         public string UserName { get; set; }
         public int QuizId {  get; set; }
-        public int Points { get; set; }
+        public float Points { get; set; }
 
     }
 }

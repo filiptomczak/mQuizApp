@@ -75,7 +75,8 @@
                 <div class="answer-block border rounded p-3 mb-2" data-new="true"">
                     <div class="mb-2">
                         <label class="form-label fw-bold">Odpowiedź:</label>
-                        <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control"/>
+                                <input name="${prefix}.Answers[${answerIndex}].Text" class="form-control"/>
+                                <input name="${prefix}.Answers[${answerIndex}].Points"  type="number" step="0.1" class="form-control"/>
                         <input type="hidden" name="${prefix}.Answers[${answerIndex}].Id" value="${answerIndex}" />
                     </div>
                     <div class="form-check">

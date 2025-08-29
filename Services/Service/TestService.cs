@@ -60,9 +60,9 @@ namespace Services.Service
             }
         }
 
-        private int CheckAnswers(List<SubmittedAnswerVM> answers)
+        private float CheckAnswers(List<SubmittedAnswerVM> answers)
         {
-            var result = 0;
+            var result = 0.0f;
             foreach (var answer in answers)
             {
                 var questionId = answer.QuestionId;
@@ -70,9 +70,11 @@ namespace Services.Service
                         .Get(q => q.Id == questionId, includeProperties: "Answers")?
                         .Answers.SingleOrDefault(a => a.IsCorrect)?
                         .Text;
-
+                var points = _questionService
+                        .Get(q => q.Id == questionId)?
+                        .Points ?? 1.0f;
                 if (correctAnswerText == answer.SelectedAnswer)
-                    result++;
+                    result+=points;
             }
             return result;
         }

@@ -14,6 +14,7 @@ namespace Models.ViewModels
         public string? Text { get; set; }
         public string? PathToFile { get; set; }
         public int QuizId { get; set; }
+        public float Points { get; set; } = 1.0f;
         public IFormFile? UploadedFile { get; set; }  // tylko na potrzeby przesy³ania
         public List<Answer> Answers { get; set; } = new List<Answer>();
 

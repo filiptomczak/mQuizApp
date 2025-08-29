@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250829084107_PointsAddedToQUestion")]
+    partial class PointsAddedToQUestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,8 +258,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("PathToFile")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("Points")
-                        .HasColumnType("real");
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
 
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
@@ -275,21 +278,21 @@ namespace DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            Points = 1f,
+                            Points = 1,
                             QuizId = 1,
                             Text = "Pytanie 1"
                         },
                         new
                         {
                             Id = 2,
-                            Points = 1f,
+                            Points = 1,
                             QuizId = 1,
                             Text = "Pytanie 2"
                         },
                         new
                         {
                             Id = 3,
-                            Points = 1f,
+                            Points = 1,
                             QuizId = 1,
                             Text = "Pytanie 3"
                         });
@@ -331,8 +334,8 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float>("Points")
-                        .HasColumnType("real");
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
 
                     b.Property<int>("QuizId")
                         .HasColumnType("int");

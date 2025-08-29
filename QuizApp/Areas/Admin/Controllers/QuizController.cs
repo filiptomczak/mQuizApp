@@ -48,6 +48,7 @@ namespace QuizApp.Areas.Admin.Controllers
                     Id = q.Id,
                     PathToFile = q.PathToFile,
                     Text = q.Text,
+                    Points = q.Points,
                     QuizId = q.QuizId,
                     Answers = q.Answers,
                 }).ToList()
