@@ -50,16 +50,35 @@ namespace Services.Service
         public async Task<Quiz> GetByIdWithQuestionsAsync(int id)
         {
             var quiz = await _unitOfWork.Quizzes.GetByIdAsync(id);
+
+            if (quiz == null)
+                return null;
+
             var questions = await _questionService.GetAllAsync();
             var answers = await _answerService.GetAllAsync();
 
-            quiz.Questions = questions
-                .Where(q => q.QuizId == quiz.Id)
-                .Select(q =>
+            // tylko te pytania, które należą do quizu
+            var filteredQuestions = questions.Where(q => q.QuizId == quiz.Id).ToList();
+
+            foreach (var q in filteredQuestions)
+            {
+                if (q is SingleChoiceQuestion scq)
                 {
-                    q.Answers = answers.Where(a => a.QuestionId == q.Id).ToList();
-                    return q;
-                }).ToList();
+                    scq.Answers = answers.Where(a => a.QuestionId == scq.Id).ToList();
+                }
+                else if (q is MatchQuestion mq)
+                {
+                    // tutaj np. PairService.GetAllByQuestionId(mq.Id)
+                    mq.Pairs = new List<MatchPair>();
+                }
+                else if (q is OpenQuestion oq)
+                {
+                    // open question nie ma answers → nic nie robimy
+                }
+            }
+
+            quiz.Questions = filteredQuestions.Cast<QuestionBase>().ToList();
+
             return quiz;
         }
         public async Task UpdateQuizAsync(QuizVM quizVM)

@@ -63,17 +63,40 @@ namespace Services.Service
         private int CheckAnswers(List<SubmittedAnswerVM> answers)
         {
             var result = 0;
-            foreach (var answer in answers)
-            {
-                var questionId = answer.QuestionId;
-                var correctAnswerText = _questionService
-                        .Get(q => q.Id == questionId, includeProperties: "Answers")?
-                        .Answers.SingleOrDefault(a => a.IsCorrect)?
-                        .Text;
 
-                if (correctAnswerText == answer.SelectedAnswer)
-                    result++;
+            foreach (var submitted in answers)
+            {
+                var question = _questionService.Get(q => q.Id == submitted.QuestionId);
+
+                if (question == null)
+                    continue;
+
+                switch (question)
+                {
+                    case SingleChoiceQuestion sc:
+                        var correct = sc.Answers.SingleOrDefault(a => a.IsCorrect)?.Text;
+                        if (!string.IsNullOrEmpty(correct) && submitted.SelectedAnswer == correct)
+                            result++;
+                        break;
+
+                    case OpenQuestion oq:
+                        if (!string.IsNullOrEmpty(oq.CorrectAnswer) &&
+                            string.Equals(oq.CorrectAnswer.Trim(), submitted.SelectedAnswer?.Trim(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            result++;
+                        }
+                        break;
+
+                    case MatchQuestion mq:
+                        // TODO: tutaj możesz porównać submitted.Pairs vs mq.Pairs
+                        // np. sprawdzając czy wszystkie dobrane elementy są poprawne
+                        break;
+
+                    default:
+                        throw new NotSupportedException($"Nieobsługiwany typ pytania: {question.GetType().Name}");
+                }
             }
+
             return result;
         }
     }

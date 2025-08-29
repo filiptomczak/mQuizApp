@@ -15,7 +15,11 @@ namespace Models.ViewModels
         public string? PathToFile { get; set; }
         public int QuizId { get; set; }
         public IFormFile? UploadedFile { get; set; }  // tylko na potrzeby przesy³ania
-        public List<Answer> Answers { get; set; } = new List<Answer>();
 
+        public List<Answer>? Answers { get; set; } = new ();
+        public List<PairVM>? Pairs { get; set; } = new ();
+        public string? CorrectAnswer { get; set; }
+        
+        public string Type { get; set; }
     }
 }

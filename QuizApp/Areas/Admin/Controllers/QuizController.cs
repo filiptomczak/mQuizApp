@@ -43,13 +43,37 @@ namespace QuizApp.Areas.Admin.Controllers
             var quizVM = new QuizVM()
             {
                 Quiz = quiz,
-                Questions = quiz.Questions.Select(q => new QuestionVM
+                Questions = quiz.Questions.Select(q =>
                 {
-                    Id = q.Id,
-                    PathToFile = q.PathToFile,
-                    Text = q.Text,
-                    QuizId = q.QuizId,
-                    //Answers = q.Answers,
+                    var qvm = new QuestionVM
+                    {
+                        Id = q.Id,
+                        PathToFile = q.PathToFile,
+                        Text = q.Text,
+                        QuizId = q.QuizId,
+                        Type = q.GetType().Name // np. "SingleChoiceQuestion"
+                    };
+
+                    switch (q)
+                    {
+                        case SingleChoiceQuestion scq:
+                            qvm.Answers = scq.Answers?.ToList() ?? new List<Answer>();
+                            break;
+
+                        case MatchQuestion mq:
+                            qvm.Pairs = mq.Pairs?.Select(p => new PairVM
+                            {
+                                ImagePath = p.ImagePath,
+                                Label = p.Label
+                            }).ToList();
+                            break;
+
+                        case OpenQuestion oq:
+                            qvm.CorrectAnswer = oq.CorrectAnswer;
+                            break;
+                    }
+
+                    return qvm;
                 }).ToList()
             };
             return View(quizVM);
